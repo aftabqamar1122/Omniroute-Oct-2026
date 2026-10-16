@@ -14,6 +14,19 @@
 // ── Configuration ──
 
 import { isFeatureFlagEnabled, resolveFeatureFlag } from "@/shared/utils/featureFlags";
+import {
+  isValidIBAN,
+  isValidES_DNI_NIE,
+  isValidIT_CodiceFiscale,
+  isValidPL_PESEL,
+  isValidNL_BSN,
+  isValidDE_SteuerID,
+  isValidSE_Personnummer,
+  isValidZA_ID,
+  isValidZA_VAT,
+  isValidZA_TaxRef,
+  isValidEU_VAT,
+} from "@/shared/utils/piiPatterns";
 
 const isEnabled = () => isFeatureFlagEnabled("PII_RESPONSE_SANITIZATION");
 
@@ -48,6 +61,8 @@ interface PIIPattern {
 }
 
 const PII_PATTERNS: PIIPattern[] = [
+  // ── Patterns with letters / specific prefixes (checked first) ──
+
   {
     name: "email",
     regex: /(?<=^|[^A-Za-z0-9])[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}(?=$|[^A-Za-z0-9])/g,
@@ -55,9 +70,39 @@ const PII_PATTERNS: PIIPattern[] = [
     severity: "medium",
   },
   {
-    name: "ssn",
-    regex: /(?<=^|[^A-Za-z0-9])\d{3}-\d{2}-\d{4}(?=$|[^A-Za-z0-9])/g,
-    replacement: "[SSN_REDACTED]",
+    name: "iban",
+    regex: /(?<=^|[^A-Za-z0-9])[A-Z]{2}\d{2}[A-Z0-9]{1,30}(?=$|[^A-Za-z0-9])/gi,
+    replacement: "[IBAN_REDACTED]",
+    severity: "high",
+  },
+  {
+    name: "eu_vat",
+    regex: /(?<=^|[^A-Za-z0-9])[A-Z]{2}[A-Z0-9]{2,12}(?=$|[^A-Za-z0-9])/g,
+    replacement: "[EU_VAT_REDACTED]",
+    severity: "medium",
+  },
+  {
+    name: "es_dni_nie",
+    regex: /(?<=^|[^A-Za-z0-9])[XYZ]?\d{8}[A-Z](?=$|[^A-Za-z0-9])/gi,
+    replacement: "[ES_DNI_REDACTED]",
+    severity: "high",
+  },
+  {
+    name: "it_codice_fiscale",
+    regex: /(?<=^|[^A-Za-z0-9])[A-Z]{6}\d{2}[A-Z]\d{2}[A-Z]\d{3}[A-Z](?=$|[^A-Za-z0-9])/gi,
+    replacement: "[IT_CF_REDACTED]",
+    severity: "high",
+  },
+  {
+    name: "aws_key",
+    regex: /(?<=^|[^A-Za-z0-9])AKIA[0-9A-Z]{16}(?=$|[^A-Za-z0-9])/g,
+    replacement: "[AWS_KEY_REDACTED]",
+    severity: "high",
+  },
+  {
+    name: "api_key_generic",
+    regex: /(?<=^|[^A-Za-z0-9])(?:sk|pk|api|key|token)[_-][a-zA-Z0-9]{20,}(?=$|[^A-Za-z0-9])/gi,
+    replacement: "[API_KEY_REDACTED]",
     severity: "high",
   },
   {
@@ -67,6 +112,75 @@ const PII_PATTERNS: PIIPattern[] = [
     replacement: "[CC_REDACTED]",
     severity: "high",
   },
+
+  // ── Specific national ID patterns with validators (checked before general patterns) ──
+
+  {
+    name: "za_id",
+    regex: /(?<=^|[^A-Za-z0-9])\d{13}(?=$|[^A-Za-z0-9])/g,
+    replacement: "[ZA_ID_REDACTED]",
+    severity: "high",
+  },
+  {
+    name: "pl_pesel",
+    regex: /(?<=^|[^A-Za-z0-9])\d{11}(?=$|[^A-Za-z0-9])/g,
+    replacement: "[PL_PESEL_REDACTED]",
+    severity: "high",
+  },
+  {
+    name: "nl_bsn",
+    regex: /(?<=^|[^A-Za-z0-9])\d{9}(?=$|[^A-Za-z0-9])/g,
+    replacement: "[NL_BSN_REDACTED]",
+    severity: "high",
+  },
+  {
+    name: "de_steuer_id",
+    regex: /(?<=^|[^A-Za-z0-9])\d{11}(?=$|[^A-Za-z0-9])/g,
+    replacement: "[DE_STEUERID_REDACTED]",
+    severity: "high",
+  },
+  {
+    name: "se_personnummer",
+    regex: /(?<=^|[^A-Za-z0-9])\d{6}[-+]?\d{4}(?=$|[^A-Za-z0-9])/g,
+    replacement: "[SE_PNR_REDACTED]",
+    severity: "high",
+  },
+  {
+    name: "cpf",
+    regex: /(?<=^|[^A-Za-z0-9])\d{3}\.?\d{3}\.?\d{3}-?\d{2}(?=$|[^A-Za-z0-9])/g,
+    replacement: "[CPF_REDACTED]",
+    severity: "high",
+  },
+  {
+    name: "cnpj",
+    regex: /(?<=^|[^A-Za-z0-9])\d{2}\.?\d{3}\.?\d{3}\/?\d{4}-?\d{2}(?=$|[^A-Za-z0-9])/g,
+    replacement: "[CNPJ_REDACTED]",
+    severity: "high",
+  },
+
+  // ── POPIA / South Africa specific patterns ──
+
+  {
+    name: "za_phone",
+    regex: /(?<=^|[^A-Za-z0-9])(?:\+?27|0)[\s-]?(?:1[0-9]|2[1-9]|3[1-9]|4[0-9]|5[1-9]|7[1-9]|8[1-9])[\s-]?\d{3}[\s-]?\d{4}(?=$|[^A-Za-z0-9])/g,
+    replacement: "[ZA_PHONE_REDACTED]",
+    severity: "medium",
+  },
+  {
+    name: "za_vat",
+    regex: /(?<=^|[^A-Za-z0-9])4\d{9}(?=$|[^A-Za-z0-9])/g,
+    replacement: "[ZA_VAT_REDACTED]",
+    severity: "medium",
+  },
+  {
+    name: "za_tax_ref",
+    regex: /(?<=^|[^A-Za-z0-9])\d{10}(?=$|[^A-Za-z0-9])/g,
+    replacement: "[ZA_TAXREF_REDACTED]",
+    severity: "medium",
+  },
+
+  // ── General patterns (checked last) ──
+
   {
     name: "phone_us",
     regex:
@@ -82,15 +196,9 @@ const PII_PATTERNS: PIIPattern[] = [
     severity: "medium",
   },
   {
-    name: "cpf",
-    regex: /(?<=^|[^A-Za-z0-9])\d{3}\.?\d{3}\.?\d{3}-?\d{2}(?=$|[^A-Za-z0-9])/g,
-    replacement: "[CPF_REDACTED]",
-    severity: "high",
-  },
-  {
-    name: "cnpj",
-    regex: /(?<=^|[^A-Za-z0-9])\d{2}\.?\d{3}\.?\d{3}\/?\d{4}-?\d{2}(?=$|[^A-Za-z0-9])/g,
-    replacement: "[CNPJ_REDACTED]",
+    name: "ssn",
+    regex: /(?<=^|[^A-Za-z0-9])\d{3}-\d{2}-\d{4}(?=$|[^A-Za-z0-9])/g,
+    replacement: "[SSN_REDACTED]",
     severity: "high",
   },
   {
@@ -117,18 +225,6 @@ const PII_PATTERNS: PIIPattern[] = [
       /(?<=^|[^A-Za-z0-9:\[]|[^A-Za-z0-9]\[)(?:[0-9a-fA-F]{1,4}(?::[0-9a-fA-F]{1,4}){7}|(?:[0-9a-fA-F]{1,4}:){1,7}:|::(?:[0-9a-fA-F]{1,4}:){0,6}[0-9a-fA-F]{1,4}|[0-9a-fA-F]{1,4}::(?:[0-9a-fA-F]{1,4}:){0,5}[0-9a-fA-F]{1,4}|(?:[0-9a-fA-F]{1,4}:){2}:(?:[0-9a-fA-F]{1,4}:){0,4}[0-9a-fA-F]{1,4}|(?:[0-9a-fA-F]{1,4}:){3}:(?:[0-9a-fA-F]{1,4}:){0,3}[0-9a-fA-F]{1,4}|(?:[0-9a-fA-F]{1,4}:){4}:(?:[0-9a-fA-F]{1,4}:){0,2}[0-9a-fA-F]{1,4}|(?:[0-9a-fA-F]{1,4}:){5}:(?:[0-9a-fA-F]{1,4}:){0,1}[0-9a-fA-F]{1,4}|(?:[0-9a-fA-F]{1,4}:){6}:[0-9a-fA-F]{1,4})(?=$|[^A-Za-z0-9])(?!:[0-9a-fA-F:])/g,
     replacement: "[IP_REDACTED]",
     severity: "low",
-  },
-  {
-    name: "aws_key",
-    regex: /(?<=^|[^A-Za-z0-9])AKIA[0-9A-Z]{16}(?=$|[^A-Za-z0-9])/g,
-    replacement: "[AWS_KEY_REDACTED]",
-    severity: "high",
-  },
-  {
-    name: "api_key_generic",
-    regex: /(?<=^|[^A-Za-z0-9])(?:sk|pk|api|key|token)[_-][a-zA-Z0-9]{20,}(?=$|[^A-Za-z0-9])/gi,
-    replacement: "[API_KEY_REDACTED]",
-    severity: "high",
   },
 ];
 
@@ -217,6 +313,43 @@ export function sanitizePII(text: string, isStreaming = false): SanitizeResult {
         continue;
       }
       if (pattern.name === "cnpj" && !isValidCNPJ(match[0])) {
+        continue;
+      }
+
+      // GDPR / EU validators
+      if (pattern.name === "iban" && !isValidIBAN(match[0])) {
+        continue;
+      }
+      if (pattern.name === "eu_vat" && !isValidEU_VAT(match[0])) {
+        continue;
+      }
+      if (pattern.name === "es_dni_nie" && !isValidES_DNI_NIE(match[0])) {
+        continue;
+      }
+      if (pattern.name === "it_codice_fiscale" && !isValidIT_CodiceFiscale(match[0])) {
+        continue;
+      }
+      if (pattern.name === "pl_pesel" && !isValidPL_PESEL(match[0])) {
+        continue;
+      }
+      if (pattern.name === "nl_bsn" && !isValidNL_BSN(match[0])) {
+        continue;
+      }
+      if (pattern.name === "de_steuer_id" && !isValidDE_SteuerID(match[0])) {
+        continue;
+      }
+      if (pattern.name === "se_personnummer" && !isValidSE_Personnummer(match[0])) {
+        continue;
+      }
+
+      // POPIA / South Africa validators
+      if (pattern.name === "za_id" && !isValidZA_ID(match[0])) {
+        continue;
+      }
+      if (pattern.name === "za_vat" && !isValidZA_VAT(match[0])) {
+        continue;
+      }
+      if (pattern.name === "za_tax_ref" && !isValidZA_TaxRef(match[0])) {
         continue;
       }
 

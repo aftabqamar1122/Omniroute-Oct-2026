@@ -9,6 +9,10 @@
 
 import { parseEnvBoolean } from "@/shared/utils/envBoolean";
 import { resolveBlockThreshold, shouldBlockDetections } from "@/shared/utils/injectionSeverity";
+import {
+  PII_PATTERNS as SHARED_PII_PATTERNS,
+  validators,
+} from "@/shared/utils/piiPatterns";
 
 // ─── Prompt Injection Patterns ───────────────────────────────────────
 
@@ -116,6 +120,7 @@ const SCAN_GAP = "\n[GAP]\n";
 
 /** @type {Array<{name: string, pattern: RegExp, replacement: string}>} */
 const PII_PATTERNS = [
+  // Existing patterns with specific formats (checked first)
   {
     name: "email",
     pattern: /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/g,
@@ -136,6 +141,48 @@ const PII_PATTERNS = [
     pattern: /\b(?:\d{4}[-\s]?){3}\d{4}\b/g,
     replacement: "[CARD_REDACTED]",
   },
+
+  // GDPR / EU patterns with specific formats (checked before general patterns)
+  {
+    name: "iban",
+    pattern: /\b[A-Z]{2}\d{2}[A-Z0-9]{1,30}\b/gi,
+    replacement: "[IBAN_REDACTED]",
+  },
+  {
+    name: "eu_vat",
+    // Require at least 4 chars after country code to avoid matching IBAN prefixes like "GB29"
+    pattern: /\b[A-Z]{2}[A-Z0-9]{4,12}\b/g,
+    replacement: "[EU_VAT_REDACTED]",
+  },
+  {
+    name: "es_dni_nie",
+    pattern: /\b[XYZ]?\d{8}[A-Z]\b/gi,
+    replacement: "[ES_DNI_REDACTED]",
+  },
+  {
+    name: "it_codice_fiscale",
+    pattern: /\b[A-Z]{6}\d{2}[A-Z]\d{2}[A-Z]\d{3}[A-Z]\b/gi,
+    replacement: "[IT_CF_REDACTED]",
+  },
+
+  // POPIA / South Africa specific patterns (checked before general digit patterns)
+  {
+    name: "za_phone",
+    pattern: /\b(?:\+?27|0)[\s-]?(?:1[0-9]|2[1-9]|3[1-9]|4[0-9]|5[1-9]|7[1-9]|8[1-9])[\s-]?\d{3}[\s-]?\d{4}\b/g,
+    replacement: "[ZA_PHONE_REDACTED]",
+  },
+  {
+    name: "za_vat",
+    pattern: /\b4\d{9}\b/g,
+    replacement: "[ZA_VAT_REDACTED]",
+  },
+  {
+    name: "za_tax_ref",
+    pattern: /\b\d{10}\b/g,
+    replacement: "[ZA_TAXREF_REDACTED]",
+  },
+
+  // General patterns (checked last)
   {
     name: "phone_br",
     pattern: /\b\(?\d{2}\)?\s?\d{4,5}-?\d{4}\b/g,
@@ -145,6 +192,35 @@ const PII_PATTERNS = [
     name: "ssn_us",
     pattern: /\b\d{3}-\d{2}-\d{4}\b/g,
     replacement: "[SSN_REDACTED]",
+  },
+
+  // EU digit-only patterns with validators on response side
+  {
+    name: "se_personnummer",
+    pattern: /\b\d{6}[-+]?\d{4}\b/g,
+    replacement: "[SE_PNR_REDACTED]",
+  },
+  {
+    name: "pl_pesel",
+    pattern: /\b\d{11}\b/g,
+    replacement: "[PL_PESEL_REDACTED]",
+  },
+  {
+    name: "nl_bsn",
+    pattern: /\b\d{9}\b/g,
+    replacement: "[NL_BSN_REDACTED]",
+  },
+  {
+    name: "de_steuer_id",
+    pattern: /\b\d{11}\b/g,
+    replacement: "[DE_STEUERID_REDACTED]",
+  },
+
+  // ZA ID (13 digits, checked last among specific patterns)
+  {
+    name: "za_id",
+    pattern: /\b\d{13}\b/g,
+    replacement: "[ZA_ID_REDACTED]",
   },
 ];
 
@@ -494,4 +570,6 @@ export {
   buildInjectionScanText,
   INJECTION_PATTERNS,
   PII_PATTERNS,
+  SHARED_PII_PATTERNS,
+  validators,
 };
