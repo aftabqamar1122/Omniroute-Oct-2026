@@ -1141,6 +1141,7 @@
       "analytics",
       "breadcrumbs",
       "cache",
+      "cliTools",
       "cloudSyncStatus",
       "codexKeyServiceMode",
       "common",
