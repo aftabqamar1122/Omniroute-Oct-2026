@@ -21,6 +21,8 @@ type UsageBucket = {
   requests: number;
   promptTokens: number;
   completionTokens: number;
+  cachedInputTokens: number | null;
+  cachedInputTokensComplete: boolean;
   cost: number;
 };
 
@@ -114,6 +116,7 @@ function buildUsageSourceSql(aggregationEnabled: boolean) {
         COALESCE(tokens_reasoning, 0) as cost_tokens_reasoning,
         0.0 as stored_cost,
         COALESCE(service_tier, 'standard') as service_tier,
+        0 as cached_input_unknown_requests,
         1 as request_count
       FROM usage_history
     `;
@@ -139,7 +142,8 @@ function buildUsageSourceSql(aggregationEnabled: boolean) {
       COALESCE(tokens_reasoning, 0) as cost_tokens_reasoning,
       0.0 as stored_cost,
       COALESCE(service_tier, 'standard') as service_tier,
-      1 as request_count
+      0 as cached_input_unknown_requests,
+        1 as request_count
     FROM usage_history
     WHERE DATE(timestamp) >= ?
 
@@ -154,7 +158,7 @@ function buildUsageSourceSql(aggregationEnabled: boolean) {
       NULL as api_key_name,
       COALESCE(total_input_tokens, 0) as tokens_input,
       COALESCE(total_output_tokens, 0) as tokens_output,
-      0 as tokens_cache_read,
+      total_cache_read_tokens as tokens_cache_read,
       0 as tokens_cache_creation,
       0 as tokens_reasoning,
       0 as cost_tokens_input,
@@ -164,6 +168,7 @@ function buildUsageSourceSql(aggregationEnabled: boolean) {
       0 as cost_tokens_reasoning,
       COALESCE(total_cost, 0.0) as stored_cost,
       'standard' as service_tier,
+      CASE WHEN total_cache_read_tokens IS NULL THEN COALESCE(total_requests, 0) ELSE 0 END as cached_input_unknown_requests,
       COALESCE(total_requests, 0) as request_count
     FROM daily_usage_summary
     WHERE date < ?
@@ -172,9 +177,10 @@ function buildUsageSourceSql(aggregationEnabled: boolean) {
 
 const AGGREGATE_FIELDS = `
   SUM(request_count) as request_count,
+  SUM(cached_input_unknown_requests) as cached_input_unknown_requests,
   COALESCE(SUM(tokens_input), 0) as tokens_input,
   COALESCE(SUM(tokens_output), 0) as tokens_output,
-  COALESCE(SUM(tokens_cache_read), 0) as tokens_cache_read,
+  SUM(tokens_cache_read) as tokens_cache_read,
   COALESCE(SUM(tokens_cache_creation), 0) as tokens_cache_creation,
   COALESCE(SUM(tokens_reasoning), 0) as tokens_reasoning,
   COALESCE(SUM(cost_tokens_input), 0) as cost_tokens_input,
@@ -214,12 +220,17 @@ function addUsage(
   requests: number,
   promptTokens: number,
   completionTokens: number,
-  cost: number
+  cost: number,
+  cachedInputTokens: number | null,
+  cachedInputTokensComplete = true
 ) {
   bucket.requests += requests;
   bucket.promptTokens += promptTokens;
   bucket.completionTokens += completionTokens;
   bucket.cost += cost;
+  if (cachedInputTokens !== null)
+    bucket.cachedInputTokens = (bucket.cachedInputTokens ?? 0) + cachedInputTokens;
+  bucket.cachedInputTokensComplete &&= cachedInputTokensComplete;
 }
 
 function getApiKeyStatsKey(apiKeyId: string | null, apiKeyName: string | null): string {
@@ -330,6 +341,15 @@ export async function getUsageStats() {
   const cutoffDate = aggregationEnabled ? await getRawDataCutoffDate() : null;
   const sourceSql = buildUsageSourceSql(aggregationEnabled);
   const sourceParams = aggregationEnabled && cutoffDate ? [cutoffDate, cutoffDate] : [];
+  // Daily archives do not retain account/key identity; their absence limits those breakdowns.
+  const archivedIdentityMissing =
+    aggregationEnabled && cutoffDate
+      ? !!db
+          .prepare(
+            "SELECT 1 FROM daily_usage_summary WHERE date < ? AND total_requests > 0 LIMIT 1"
+          )
+          .get(cutoffDate)
+      : false;
 
   const { getProviderConnections } = await import("@/lib/db/providers");
   let allConnections: unknown[] = [];
@@ -362,6 +382,8 @@ export async function getUsageStats() {
     totalRequests: number;
     totalPromptTokens: number;
     totalCompletionTokens: number;
+    totalCachedInputTokens: number | null;
+    totalCachedInputTokensComplete: boolean;
     totalCost: number;
     byProvider: Record<string, UsageBreakdown>;
     byModel: Record<string, UsageBreakdown>;
@@ -374,6 +396,8 @@ export async function getUsageStats() {
     totalRequests: 0,
     totalPromptTokens: 0,
     totalCompletionTokens: 0,
+    totalCachedInputTokens: null,
+    totalCachedInputTokensComplete: true,
     totalCost: 0,
     byProvider: {},
     byModel: {},
@@ -397,7 +421,14 @@ export async function getUsageStats() {
   for (let i = 0; i < 10; i++) {
     const bucketTime = new Date(currentMinuteStart.getTime() - (9 - i) * 60 * 1000);
     const bucketKey = bucketTime.getTime();
-    bucketMap[bucketKey] = { requests: 0, promptTokens: 0, completionTokens: 0, cost: 0 };
+    bucketMap[bucketKey] = {
+      requests: 0,
+      promptTokens: 0,
+      completionTokens: 0,
+      cachedInputTokens: null,
+      cachedInputTokensComplete: true,
+      cost: 0,
+    };
     stats.last10Minutes.push(bucketMap[bucketKey]);
   }
 
@@ -422,12 +453,18 @@ export async function getUsageStats() {
     const requestCount = toNumber(row.request_count);
     const promptTokens = toNumber(row.tokens_input);
     const completionTokens = toNumber(row.tokens_output);
+    const cachedInputTokens =
+      row.tokens_cache_read == null ? null : toNumber(row.tokens_cache_read);
+    const cachedInputTokensComplete = toNumber(row.cached_input_unknown_requests) === 0;
     const entryCost = await calculateAggregateCost(row);
 
     stats.totalRequests += requestCount;
     stats.totalPromptTokens += promptTokens;
     stats.totalCompletionTokens += completionTokens;
     stats.totalCost += entryCost;
+    if (cachedInputTokens !== null)
+      stats.totalCachedInputTokens = (stats.totalCachedInputTokens ?? 0) + cachedInputTokens;
+    stats.totalCachedInputTokensComplete &&= cachedInputTokensComplete;
 
     // By Provider
     if (!stats.byProvider[provider]) {
@@ -435,10 +472,20 @@ export async function getUsageStats() {
         requests: 0,
         promptTokens: 0,
         completionTokens: 0,
+        cachedInputTokens: null,
+        cachedInputTokensComplete: true,
         cost: 0,
       };
     }
-    addUsage(stats.byProvider[provider], requestCount, promptTokens, completionTokens, entryCost);
+    addUsage(
+      stats.byProvider[provider],
+      requestCount,
+      promptTokens,
+      completionTokens,
+      entryCost,
+      cachedInputTokens,
+      cachedInputTokensComplete
+    );
 
     // By Model
     const modelKey = provider ? `${model} (${provider})` : model;
@@ -447,13 +494,23 @@ export async function getUsageStats() {
         requests: 0,
         promptTokens: 0,
         completionTokens: 0,
+        cachedInputTokens: null,
+        cachedInputTokensComplete: true,
         cost: 0,
         rawModel: model,
         provider,
         lastUsed: timestamp,
       };
     }
-    addUsage(stats.byModel[modelKey], requestCount, promptTokens, completionTokens, entryCost);
+    addUsage(
+      stats.byModel[modelKey],
+      requestCount,
+      promptTokens,
+      completionTokens,
+      entryCost,
+      cachedInputTokens,
+      cachedInputTokensComplete
+    );
     if (new Date(timestamp) > new Date(stats.byModel[modelKey].lastUsed || timestamp)) {
       stats.byModel[modelKey].lastUsed = timestamp;
     }
@@ -480,6 +537,10 @@ export async function getUsageStats() {
     const requestCount = toNumber(row.request_count);
     const promptTokens = toNumber(row.tokens_input);
     const completionTokens = toNumber(row.tokens_output);
+    const cachedInputTokens =
+      row.tokens_cache_read == null ? null : toNumber(row.tokens_cache_read);
+    const cachedInputTokensComplete =
+      !archivedIdentityMissing && toNumber(row.cached_input_unknown_requests) === 0;
     const entryCost = await calculateAggregateCost(row);
 
     if (connectionId) {
@@ -491,6 +552,8 @@ export async function getUsageStats() {
           requests: 0,
           promptTokens: 0,
           completionTokens: 0,
+          cachedInputTokens: null,
+          cachedInputTokensComplete: true,
           cost: 0,
           rawModel: model,
           provider,
@@ -504,7 +567,9 @@ export async function getUsageStats() {
         requestCount,
         promptTokens,
         completionTokens,
-        entryCost
+        entryCost,
+        cachedInputTokens,
+        cachedInputTokensComplete
       );
       if (new Date(timestamp) > new Date(stats.byAccount[accountKey].lastUsed || timestamp)) {
         stats.byAccount[accountKey].lastUsed = timestamp;
@@ -533,6 +598,10 @@ export async function getUsageStats() {
     const requestCount = toNumber(row.request_count);
     const promptTokens = toNumber(row.tokens_input);
     const completionTokens = toNumber(row.tokens_output);
+    const cachedInputTokens =
+      row.tokens_cache_read == null ? null : toNumber(row.tokens_cache_read);
+    const cachedInputTokensComplete =
+      !archivedIdentityMissing && toNumber(row.cached_input_unknown_requests) === 0;
     const entryCost = await calculateAggregateCost(row);
 
     if (apiKeyId || apiKeyName) {
@@ -547,6 +616,8 @@ export async function getUsageStats() {
           requests: 0,
           promptTokens: 0,
           completionTokens: 0,
+          cachedInputTokens: null,
+          cachedInputTokensComplete: true,
           cost: 0,
           apiKeyId,
           apiKeyName: displayName,
@@ -559,7 +630,15 @@ export async function getUsageStats() {
         apiKeyStats.historicalApiKeyNames?.push(apiKeyName);
       }
       apiKeyStats.apiKeyName = displayName;
-      addUsage(apiKeyStats, requestCount, promptTokens, completionTokens, entryCost);
+      addUsage(
+        apiKeyStats,
+        requestCount,
+        promptTokens,
+        completionTokens,
+        entryCost,
+        cachedInputTokens,
+        cachedInputTokensComplete
+      );
       if (new Date(timestamp) > new Date(apiKeyStats.lastUsed || timestamp)) {
         apiKeyStats.lastUsed = timestamp;
       }
@@ -596,8 +675,19 @@ export async function getUsageStats() {
     const requestCount = toNumber(row.request_count);
     const promptTokens = toNumber(row.tokens_input);
     const completionTokens = toNumber(row.tokens_output);
+    const cachedInputTokens =
+      row.tokens_cache_read == null ? null : toNumber(row.tokens_cache_read);
+    const cachedInputTokensComplete = toNumber(row.cached_input_unknown_requests) === 0;
     const entryCost = await calculateAggregateCost(row);
-    addUsage(bucketMap[bucketKey], requestCount, promptTokens, completionTokens, entryCost);
+    addUsage(
+      bucketMap[bucketKey],
+      requestCount,
+      promptTokens,
+      completionTokens,
+      entryCost,
+      cachedInputTokens,
+      cachedInputTokensComplete
+    );
   }
 
   return stats;
