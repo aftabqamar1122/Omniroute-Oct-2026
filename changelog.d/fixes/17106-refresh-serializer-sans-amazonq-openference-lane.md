@@ -1,0 +1,1 @@
+- **fix(oauth):** serializes Amazon Q and Openference token refreshes in their rotation lane so sibling accounts no longer POST rotating refresh tokens concurrently ([#17106](https://github.com/diegosouzapw/OmniRoute/pull/17106)) — thanks @maxmad64bis
