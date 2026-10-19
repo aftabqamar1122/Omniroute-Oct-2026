@@ -8,7 +8,8 @@
  */
 import dns from "node:dns";
 import { isIP } from "node:net";
-import { BaseExecutor, type ExecuteInput } from "./base.ts";
+import { BaseExecutor, type ExecuteInput, type ProviderCredentials } from "./base.ts";
+import { normalizeSessionCookieHeader } from "@/lib/providers/webCookieAuth";
 import { sanitizeErrorMessage } from "../utils/error.ts";
 import {
   OutboundUrlGuardError,
@@ -52,6 +53,65 @@ class VeoArtifactError extends Error {
     this.status = status;
     this.retryable = options?.retryable === true;
   }
+}
+
+function isVeoAiFreeLoginRequired(text: string): boolean {
+  if (!text) return false;
+  const lower = text.toLowerCase();
+  return (
+    lower.includes("login to create") ||
+    lower.includes("log in to create") ||
+    lower.includes("please login") ||
+    lower.includes("please log in")
+  );
+}
+
+function resolveVeoAiFreeCookie(credentials?: ProviderCredentials): string {
+  if (!credentials) return "";
+
+  const psd = credentials.providerSpecificData;
+  if (psd && typeof psd === "object") {
+    const data = psd as Record<string, unknown>;
+    if (typeof data.cookie === "string" && data.cookie.trim()) {
+      return normalizeSessionCookieHeader(data.cookie.trim(), "wordpress_logged_in");
+    }
+    const wpKey = Object.keys(data).find(
+      (k) =>
+        (k.startsWith("wordpress_logged_in") || k.includes("wordpress_logged_in")) &&
+        typeof data[k] === "string" &&
+        (data[k] as string).trim()
+    );
+    if (wpKey) {
+      return normalizeSessionCookieHeader(String(data[wpKey]).trim(), wpKey);
+    }
+  }
+
+  const rawKey = credentials.apiKey;
+  if (typeof rawKey === "string" && rawKey.trim()) {
+    const trimmed = rawKey.trim();
+    if (trimmed.startsWith("{") && trimmed.endsWith("}")) {
+      try {
+        const parsed = JSON.parse(trimmed) as Record<string, unknown>;
+        if (typeof parsed.cookie === "string" && parsed.cookie.trim()) {
+          return normalizeSessionCookieHeader(parsed.cookie.trim(), "wordpress_logged_in");
+        }
+        const wpKey = Object.keys(parsed).find(
+          (k) =>
+            (k.startsWith("wordpress_logged_in") || k.includes("wordpress_logged_in")) &&
+            typeof parsed[k] === "string" &&
+            (parsed[k] as string).trim()
+        );
+        if (wpKey) {
+          return normalizeSessionCookieHeader(String(parsed[wpKey]).trim(), wpKey);
+        }
+      } catch {
+        // Fall back to treating as cookie header
+      }
+    }
+    return normalizeSessionCookieHeader(trimmed, "wordpress_logged_in");
+  }
+
+  return "";
 }
 
 // ————————————————————————— Helpers —————————————————————————
@@ -239,9 +299,9 @@ async function postAjax(
   return res.text();
 }
 
-function buildSessionContext(signal?: AbortSignal): VeoSessionContext {
+function buildSessionContext(signal?: AbortSignal, cookieHeader = ""): VeoSessionContext {
   return {
-    cookieHeader: "",
+    cookieHeader,
     userAgent: USER_AGENT,
     origin: BASE_URL,
     referer: `${BASE_URL}/`,
@@ -276,6 +336,13 @@ async function handleImage(
     actionType: "banan-image-generator",
   });
   const trimmed = result.trim();
+  if (isVeoAiFreeLoginRequired(trimmed)) {
+    return errResp(
+      "Authentication required: login to veoaifree.com to generate images",
+      401,
+      "authentication_required"
+    );
+  }
   if (!trimmed || trimmed === "0" || trimmed.toLowerCase().includes("error")) {
     return errResp("Image generation failed");
   }
@@ -363,6 +430,13 @@ async function handleEnhance(
     actionType: "main-prompt-generation",
   });
   const trimmed = result.trim();
+  if (isVeoAiFreeLoginRequired(trimmed)) {
+    return errResp(
+      "Authentication required: login to veoaifree.com to enhance prompts",
+      401,
+      "authentication_required"
+    );
+  }
   if (!trimmed || trimmed === "0") {
     return errResp("Prompt enhancement failed");
   }
@@ -645,7 +719,26 @@ async function handleVideo(
     actionType: "full-video-generate",
   });
   const sceneData = genResult.trim();
-  if (!sceneData || sceneData === "0" || sceneData.toLowerCase().includes("error")) {
+  if (isVeoAiFreeLoginRequired(sceneData)) {
+    return errResp(
+      "Authentication required: login to veoaifree.com to generate videos",
+      401,
+      "authentication_required"
+    );
+  }
+  if (
+    sceneData.toLowerCase().includes("rate-limit-exceed") ||
+    sceneData.toLowerCase().includes("rate limit")
+  ) {
+    return errResp("Veo AI Free rate limit exceeded", 429, "rate_limit_exceeded");
+  }
+  if (
+    !sceneData ||
+    sceneData === "0" ||
+    sceneData.toLowerCase().includes("error") ||
+    sceneData.startsWith("<") ||
+    sceneData.includes("</")
+  ) {
     return errResp("Video generation failed");
   }
 
@@ -658,6 +751,13 @@ async function handleVideo(
         actionType: "final-video-results",
       });
       const trimmed = pollResult.trim();
+      if (isVeoAiFreeLoginRequired(trimmed)) {
+        return errResp(
+          "Authentication required: login to veoaifree.com to generate videos",
+          401,
+          "authentication_required"
+        );
+      }
       if (!trimmed || trimmed === "0" || trimmed.toLowerCase().includes("error")) {
         continue;
       }
@@ -737,7 +837,8 @@ export class VeoAIFreeWebExecutor extends BaseExecutor {
       return { response: resp, url: TTS_URL, headers: {}, transformedBody: { intent, model } };
     }
 
-    const context = buildSessionContext(input.signal || undefined);
+    const cookieHeader = resolveVeoAiFreeCookie(input.credentials);
+    const context = buildSessionContext(input.signal || undefined, cookieHeader);
 
     let nonce: string;
     try {

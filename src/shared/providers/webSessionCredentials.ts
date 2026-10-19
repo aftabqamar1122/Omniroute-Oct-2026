@@ -1,4 +1,4 @@
-import { WEB_COOKIE_PROVIDERS } from "@/shared/constants/providers";
+import { WEB_COOKIE_PROVIDERS, resolveProviderId } from "@/shared/constants/providers";
 
 export type WebSessionCredentialRequirement =
   | {
@@ -410,6 +410,13 @@ export const WEB_SESSION_CREDENTIAL_REQUIREMENTS = {
       "uid",
     ],
   },
+  "veoaifree-web": {
+    kind: "cookie",
+    credentialName: "wordpress_logged_in cookie",
+    placeholder: "wordpress_logged_in_...=... or full Cookie header from veoaifree.com",
+    acceptsFullCookieHeader: true,
+    storageKeys: ["cookie", "wordpress_logged_in"],
+  },
 } satisfies Record<string, WebSessionCredentialRequirement> &
   Record<keyof typeof WEB_COOKIE_PROVIDERS, WebSessionCredentialRequirement>;
 
@@ -417,10 +424,15 @@ export function getWebSessionCredentialRequirement(
   providerId: unknown
 ): WebSessionCredentialRequirement | null {
   if (typeof providerId !== "string") return null;
+  const canonical = resolveProviderId(providerId);
   return (
     WEB_SESSION_CREDENTIAL_REQUIREMENTS[
+      canonical as keyof typeof WEB_SESSION_CREDENTIAL_REQUIREMENTS
+    ] ??
+    WEB_SESSION_CREDENTIAL_REQUIREMENTS[
       providerId as keyof typeof WEB_SESSION_CREDENTIAL_REQUIREMENTS
-    ] ?? null
+    ] ??
+    null
   );
 }
 
@@ -448,7 +460,10 @@ export function hasUsableWebSessionCredential(
   if (!providerSpecificData || typeof providerSpecificData !== "object") return false;
 
   const data = providerSpecificData as Record<string, unknown>;
-  return requirement.storageKeys.some((key) => hasNonEmptyString(data[key]));
+  return (
+    requirement.storageKeys.some((key) => hasNonEmptyString(data[key])) ||
+    Object.keys(data).some((k) => k.startsWith("wordpress_logged_in") && hasNonEmptyString(data[k]))
+  );
 }
 
 /**

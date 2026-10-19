@@ -26,6 +26,26 @@ function hasUsableApiKey(value: unknown): value is string {
   return typeof value === "string" && value.trim().length > 0;
 }
 
+function hasUsableConnectionCredential(connection: ProviderConnectionView): boolean {
+  if (hasUsableApiKey(connection.apiKey)) return true;
+  const psd = connection.providerSpecificData;
+  if (psd && typeof psd === "object") {
+    const rec = psd as Record<string, unknown>;
+    if (typeof rec.cookie === "string" && rec.cookie.trim().length > 0) return true;
+    if (
+      Object.keys(rec).some(
+        (k) =>
+          k.startsWith("wordpress_logged_in") &&
+          typeof rec[k] === "string" &&
+          (rec[k] as string).trim().length > 0
+      )
+    ) {
+      return true;
+    }
+  }
+  return false;
+}
+
 // Terminal statuses stay unavailable until credentials/settings change — an
 // operator reset, not a cooldown expiry, clears them (see auth.ts's
 // isTerminalConnectionStatus, which this mirrors for the optional-key path).
@@ -93,7 +113,7 @@ export async function loadOptionalNoAuthApiKeyCredentials(
         conn.id.length > 0 &&
         !excludedConnectionIds.has(conn.id) &&
         conn.isActive !== false &&
-        hasUsableApiKey(conn.apiKey)
+        hasUsableConnectionCredential(conn)
     )
     .sort((a, b) => (a.priority || 999) - (b.priority || 999));
 
@@ -101,7 +121,7 @@ export async function loadOptionalNoAuthApiKeyCredentials(
   // handing one back regardless of health. If every candidate is unhealthy,
   // fall through to the caller's anonymous/synthetic no-auth fallback.
   const connection = connections.find(isConnectionHealthy);
-  if (!connection || !hasUsableApiKey(connection.apiKey)) return null;
+  if (!connection || !hasUsableConnectionCredential(connection)) return null;
 
   const providerSpecificData =
     connection.providerSpecificData && typeof connection.providerSpecificData === "object"
@@ -109,7 +129,7 @@ export async function loadOptionalNoAuthApiKeyCredentials(
       : {};
 
   return {
-    apiKey: connection.apiKey.trim(),
+    apiKey: (connection.apiKey || "").trim(),
     accessToken: null,
     refreshToken: null,
     expiresAt: null,
