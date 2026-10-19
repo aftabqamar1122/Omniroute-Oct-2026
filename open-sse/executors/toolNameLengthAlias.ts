@@ -58,13 +58,24 @@ export function applyToolNameLengthAliases(
   return aliases;
 }
 
-/** Applies the provider's registry-declared `toolNameMaxLength`, if any. */
+/**
+ * Applies the provider's registry-declared `toolNameMaxLength`, falling back to the
+ * connection's `providerSpecificData.toolNameMaxLength` so custom `*-compatible-*`
+ * nodes (which never have a registry entry) can opt in for a stricter upstream.
+ */
 export function applyRegistryToolNameLengthAliases(
   provider: string,
   body: unknown,
-  normalize?: ToolNameNormalizer
+  normalize?: ToolNameNormalizer,
+  providerSpecificData?: unknown
 ): Map<string, string> {
-  return applyToolNameLengthAliases(body, getRegistryEntry(provider)?.toolNameMaxLength, normalize);
+  const connectionLimit = isRecord(providerSpecificData)
+    ? providerSpecificData.toolNameMaxLength
+    : undefined;
+  const maxLength =
+    getRegistryEntry(provider)?.toolNameMaxLength ??
+    (typeof connectionLimit === "number" ? connectionLimit : undefined);
+  return applyToolNameLengthAliases(body, maxLength, normalize);
 }
 
 /**

@@ -1,4 +1,8 @@
-import { OPENAI_COMPATIBLE_PREFIX, USAGE_SUPPORTED_PROVIDERS } from "@/shared/constants/providers";
+import {
+  ANTHROPIC_COMPATIBLE_PREFIX,
+  OPENAI_COMPATIBLE_PREFIX,
+  USAGE_SUPPORTED_PROVIDERS,
+} from "@/shared/constants/providers";
 import { isMoonshotOpenPlatformConnection } from "@omniroute/open-sse/services/usage/moonshotOpenPlatform.ts";
 
 export interface ProviderQuotaVisibilityConnection {
@@ -28,8 +32,8 @@ export function supportsProviderQuota(
 }
 
 /**
- * True for an `openai-compatible-*` connection carrying a usable
- * `providerSpecificData.quotaEndpoint`: a non-empty `url` and at least one
+ * True for an `openai-compatible-*` or `anthropic-compatible-*` connection carrying a
+ * usable `providerSpecificData.quotaEndpoint`: a non-empty `url` and at least one
  * entry in `quotas`. Both halves are required — an endpoint with no mapping
  * can be fetched but never produces a quota, so treating it as supported would
  * put a permanently empty card in Provider Limits.
@@ -38,7 +42,13 @@ export function hasOpenAiCompatibleQuotaEndpoint(
   providerId: string,
   providerSpecificData: unknown
 ): boolean {
-  if (typeof providerId !== "string" || !providerId.startsWith(OPENAI_COMPATIBLE_PREFIX)) {
+  if (
+    typeof providerId !== "string" ||
+    !(
+      providerId.startsWith(OPENAI_COMPATIBLE_PREFIX) ||
+      providerId.startsWith(ANTHROPIC_COMPATIBLE_PREFIX)
+    )
+  ) {
     return false;
   }
   const psd = providerSpecificData as { quotaEndpoint?: unknown } | null | undefined;

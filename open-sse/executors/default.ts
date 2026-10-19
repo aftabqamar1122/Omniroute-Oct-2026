@@ -1061,7 +1061,12 @@ export class DefaultExecutor extends BaseExecutor {
       }
     }
 
-    applyRegistryToolNameLengthAliases(this.provider, withDefaults);
+    applyRegistryToolNameLengthAliases(
+      this.provider,
+      withDefaults,
+      undefined,
+      credentials?.providerSpecificData
+    );
 
     if (this.provider === "workbuddy") {
       withDefaults = sanitizeWorkbuddyBody(withDefaults);
