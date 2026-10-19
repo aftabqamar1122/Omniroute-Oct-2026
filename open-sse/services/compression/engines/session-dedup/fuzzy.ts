@@ -83,6 +83,7 @@ export interface FuzzyPassOptions {
   maxBlocks: number;
   minBlockChars: number;
   principalId?: string;
+  boundary?: number;
 }
 export interface FuzzyPassResult {
   messages: MessageLike[];
@@ -111,6 +112,7 @@ export function applyFuzzyPass(messages: MessageLike[], opts: FuzzyPassOptions):
 
     const replacements = new Map<number, string>();
     for (const nd of nearDups) {
+      if (opts.boundary !== undefined && nd.block.index >= opts.boundary) continue;
       const stored = tryStoreBlock(nd.block.text, opts.principalId, { source: "session-dedup" });
       if (!stored.stored) continue;
       const marker = buildCcrMarker(stored.hash, nd.block.text.length);
@@ -137,7 +139,8 @@ export function runFuzzyPass(
   stepConfig: Record<string, unknown>,
   minBlockChars: number,
   principalId?: string,
-  callerCanRetrieve = false
+  callerCanRetrieve = false,
+  boundary?: number
 ): FuzzyPassResult {
   const raw = stepConfig["fuzzy"] as
     boolean | { enabled?: boolean; minJaccard?: number; shingleSize?: number } | undefined;
@@ -154,5 +157,6 @@ export function runFuzzyPass(
     maxBlocks: MAX_FUZZY_BLOCKS,
     minBlockChars,
     principalId,
+    boundary,
   });
 }
