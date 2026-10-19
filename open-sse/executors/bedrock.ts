@@ -50,8 +50,32 @@ function normalizeRole(role) {
   return "user";
 }
 
+// #17143: Bedrock validates tool-use ids against ^[a-zA-Z0-9_-]+$ and 400s
+// the whole request when replaying history that carries anything else (dots,
+// colons, slashes, query chars — common in VS Code / IDE-bridge ids, which
+// Anthropic accepts). The mapping must be a PURE function of the ORIGINAL id:
+// a tool_use and its tool_result go through this same helper, so deriving the
+// replacement deterministically keeps the pair normalized to the same string,
+// and the digest suffix keeps distinct originals distinct after the lossy
+// character replacement. Already-valid ids pass through exactly unchanged.
+const BEDROCK_TOOL_ID_PATTERN = /^[a-zA-Z0-9_-]+$/;
+
+function fnv1a32Hex(value) {
+  let hash = 0x811c9dc5;
+  for (let i = 0; i < value.length; i++) {
+    hash ^= value.charCodeAt(i);
+    hash = Math.imul(hash, 0x01000193) >>> 0;
+  }
+  return hash.toString(16).padStart(8, "0");
+}
+
 function normalizeToolUseId(value) {
-  return typeof value === "string" && value.trim() ? value.trim() : null;
+  if (typeof value !== "string") return null;
+  const trimmed = value.trim();
+  if (!trimmed) return null;
+  if (BEDROCK_TOOL_ID_PATTERN.test(trimmed)) return trimmed;
+  const sanitized = trimmed.replace(/[^a-zA-Z0-9_-]/g, "_").slice(0, 48);
+  return `${sanitized}_${fnv1a32Hex(trimmed)}`;
 }
 
 function textBlocksFromContent(content, options = {}) {
