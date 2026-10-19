@@ -2356,8 +2356,9 @@ async function handleChatCoreInner({
 
   // === Quota Share enforcement PRE-hook (B/F7) + G2 combo soft penalty ===
   // Extracted to chatCore/quotaSharePreHook.ts (chatCore slice 2). Fail-open per B16; a block
-  // returns the 429 response after finalizing the pending-request slot.
-  const quotaShareBlockedResponse = await runQuotaSharePreHook({
+  // returns the structured 429 error result (`errorCode: "quota_share_blocked"`, #17132) after
+  // finalizing the pending-request slot.
+  const quotaShareBlockResult = await runQuotaSharePreHook({
     apiKeyInfo,
     credentials,
     provider,
@@ -2369,7 +2370,7 @@ async function handleChatCoreInner({
       trackPendingRequest(model, provider, pendingConnId, false, undefined, pendingRequestId),
     log,
   });
-  if (quotaShareBlockedResponse) return quotaShareBlockedResponse;
+  if (quotaShareBlockResult) return quotaShareBlockResult;
   // === /Quota Share enforcement PRE-hook ===
   if (isFeatureFlagEnabled("CAPABILITY_FILTER_ENABLED")) {
     const fit = checkRequestCapabilityFit(
