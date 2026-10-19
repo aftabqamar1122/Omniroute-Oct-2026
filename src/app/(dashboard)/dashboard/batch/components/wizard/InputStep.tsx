@@ -45,7 +45,12 @@ export default function InputStep({ input, onChange, destination }: InputStepPro
   const isCsv = input.kind === "csv";
 
   function handleKindChange(kind: "jsonl" | "csv") {
-    onChange({ kind, fileName: null, rawContent: null, csvMapping: kind === "csv" ? {} : undefined });
+    onChange({
+      kind,
+      fileName: null,
+      rawContent: null,
+      csvMapping: kind === "csv" ? {} : undefined,
+    });
     setCsvJsonl(null);
   }
 
@@ -61,11 +66,13 @@ export default function InputStep({ input, onChange, destination }: InputStepPro
     }
     setIsReading(true);
     try {
-      const content = await readFileContent(file);
+      // CSV conversion needs every row; JSONL keeps a bounded preview (D7).
+      const content = input.kind === "csv" ? await file.text() : await readFileContent(file);
       onChange({
         kind: input.kind,
         fileName: file.name,
         rawContent: content,
+        originalFile: input.kind === "jsonl" ? file : undefined,
         csvMapping: input.kind === "csv" ? (input.csvMapping ?? {}) : undefined,
       });
     } catch (err) {
