@@ -28,8 +28,9 @@ function safeCapMaxOutputTokens(model: string, provider?: string | null): number
  *   - Target max_tokens = responseRoom + requestedBudget, capped at modelCap
  *   - fittedBudget = max_tokens - responseRoom (the thinking budget actually used)
  *   - If the cap squeezes fittedBudget below the Anthropic minimum, retry with
- *     responseRoom shrunk to MIN_RESPONSE_ROOM; if still below MIN, disable
- *     thinking entirely (cap too tight for any reasoning).
+ *     responseRoom shrunk to MIN_RESPONSE_ROOM while KEEPING the capped target
+ *     (#17109); if the requested budget still does not fit above the floor,
+ *     disable thinking entirely (cap too tight for any reasoning).
  *
  * `provider` scopes the cap lookup to a provider-specific override (e.g. a
  * dashboard-set `max_output_tokens` for `opencode-go/qwen3.7-plus`) when the
@@ -76,11 +77,15 @@ export function fitThinkingToMaxTokens(
   // response room to MIN_RESPONSE_ROOM to recover budget.
   if (fittedBudget < MIN_CLAUDE_THINKING_BUDGET && responseRoom > MIN_RESPONSE_ROOM) {
     responseRoom = MIN_RESPONSE_ROOM;
-    target =
-      modelCap === null
-        ? responseRoom + requestedBudget
-        : Math.min(responseRoom + requestedBudget, modelCap);
-    fittedBudget = target - responseRoom;
+    // #17109: KEEP the already-capped target — the caller's output intent was
+    // preserved up to the model cap (e.g. Haiku's 64000), and only the split
+    // between thinking and response changes here. Recomputing `target` from the
+    // shrunk response room (the old behavior) collapsed the whole budget to
+    // MIN_RESPONSE_ROOM + requestedBudget (e.g. 2048) and truncated every
+    // capped-model response at that size. The requested budget now fits within
+    // whatever remains above the reserved response room — clamped so a
+    // sub-floor request still falls through to the disable check below.
+    fittedBudget = Math.min(requestedBudget, target - responseRoom);
   }
 
   // Cap too tight for any thinking — disable rather than send an invalid request.
