@@ -1,0 +1,1 @@
+- Contain two malformed-upstream payloads as request-scoped failures instead of provider outages: a Responses stream that aborts with a bare error frame now reports `status: "failed"` with that error rather than collapsing to an empty success, and non-object tool-call arguments now raise a typed `SyntaxError` instead of escaping the non-streaming translator.

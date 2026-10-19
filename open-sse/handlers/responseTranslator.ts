@@ -850,8 +850,21 @@ function convertOpenAINonStreamingToClaude(
         type: "tool_use",
         id: sanitizeToolId(rawId),
         name: restoreClaudeToolName(toString(fn.name), toolNameMap ?? null),
-        input:
-          typeof fn.arguments === "string" ? JSON.parse(fn.arguments || "{}") : fn.arguments || {},
+        input: (() => {
+          // A malformed `arguments` payload used to throw a raw JSON.parse error
+          // (or a non-object through) out of the translator, which the caller
+          // classified as a provider outage. Fail with a typed, request-scoped
+          // error that keeps the original cause for the logs.
+          let parsed: unknown;
+          try {
+            parsed = typeof fn.arguments === "string" ? JSON.parse(fn.arguments) : fn.arguments;
+          } catch (cause) {
+            throw new SyntaxError("Tool-call arguments must be a JSON object", { cause });
+          }
+          if (!parsed || typeof parsed !== "object" || Array.isArray(parsed))
+            throw new SyntaxError("Tool-call arguments must be a JSON object");
+          return parsed;
+        })(),
       });
     }
   }

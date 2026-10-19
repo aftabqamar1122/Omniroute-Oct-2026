@@ -687,9 +687,18 @@ export function parseSSEToResponsesOutput(rawSSE, fallbackModel) {
   let terminalResponse = null;
   let terminalEventType = "";
   let latestResponse = null;
+  let streamError: unknown = null;
   const outputItems = new Map();
 
   for (const evt of events) {
+    // A provider can abort a Responses stream with a bare error frame that never
+    // produces a terminal snapshot. Capture it so the caller reports `failed`
+    // instead of an empty, apparently-successful response.
+    if (!Array.isArray(evt.choices)) {
+      const error = evt.error;
+      if ((typeof error === "string" && error.trim()) || Object.keys(toRecord(error)).length > 0)
+        streamError ??= error;
+    }
     const eventType = toString(evt?.type);
     const outputIndex = toOutputIndex(evt?.output_index);
     const item = toRecord(evt?.item);
@@ -818,7 +827,7 @@ export function parseSSEToResponsesOutput(rawSSE, fallbackModel) {
     }
   }
 
-  const picked = terminalResponse || latestResponse;
+  const picked = terminalResponse || latestResponse || (streamError ? {} : null);
   if (!picked || typeof picked !== "object") return null;
   const reconstructedOutput = [...outputItems.entries()]
     .sort((a, b) => a[0] - b[0])
@@ -880,8 +889,8 @@ export function parseSSEToResponsesOutput(rawSSE, fallbackModel) {
       };
     }),
     usage: picked.usage || null,
-    status: picked.status || statusFallback,
-    ...(picked.error != null ? { error: picked.error } : {}),
+    status: streamError ? "failed" : picked.status || statusFallback,
+    ...(streamError != null || picked.error != null ? { error: streamError ?? picked.error } : {}),
     created_at: picked.created_at || Math.floor(Date.now() / 1000),
     metadata: picked.metadata || {},
   };
