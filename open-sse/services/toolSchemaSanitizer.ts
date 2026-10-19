@@ -164,6 +164,55 @@ export function sanitizeOpenAITools(tools: unknown[]): unknown[] {
   return tools.map(sanitizeOpenAITool);
 }
 
+/**
+ * Whether an anyOf branch can be flattened into the root object schema: a
+ * plain object without a `$ref` whose declared `type` (when present) admits
+ * "object" — absent, `"object"`, or a type array containing "object".
+ * Branches that fail (a `$ref`, `type: "string"`, …) keep the `anyOf`
+ * untouched instead of being merged into a wider object schema.
+ */
+function objectCompatibleBranch(branch: unknown): boolean {
+  if (!isPlainObject(branch)) return false;
+  if (hasOwn(branch, "$ref")) return false;
+  const type = branch.type;
+  return (
+    type === undefined || type === "object" || (Array.isArray(type) && type.includes("object"))
+  );
+}
+
+function applyAnyOfBranch(merged: Record<string, unknown>, branch: unknown): void {
+  if (!isPlainObject(branch)) return;
+  if (isPlainObject(branch.properties)) {
+    const base = isPlainObject(merged.properties) ? merged.properties : {};
+    merged.properties = { ...base, ...branch.properties };
+  }
+  if (Array.isArray(branch.required)) {
+    const base = Array.isArray(merged.required) ? merged.required : [];
+    merged.required = [...new Set([...base, ...branch.required])];
+  }
+  if (branch.additionalProperties !== undefined && merged.additionalProperties === undefined) {
+    merged.additionalProperties = branch.additionalProperties;
+  }
+  if (branch.type === "object" && merged.type === undefined) {
+    merged.type = "object";
+  }
+}
+
+function mergeRootAnyOfBranches(
+  parameters: Record<string, unknown>,
+  branches: unknown[]
+): Record<string, unknown> {
+  const merged = { ...parameters };
+  delete merged.anyOf;
+  for (const branch of branches) applyAnyOfBranch(merged, branch);
+  if (Array.isArray(merged.required) && isPlainObject(merged.properties)) {
+    const validKeys = new Set(Object.keys(merged.properties));
+    merged.required = (merged.required as string[]).filter((r) => validKeys.has(r));
+  }
+  if (merged.type === undefined) merged.type = "object";
+  return merged;
+}
+
 export function flattenOpenAIToolRootAnyOf(tools: unknown): unknown {
   if (!Array.isArray(tools)) return tools;
   return tools.map((tool) => {
@@ -173,9 +222,11 @@ export function flattenOpenAIToolRootAnyOf(tools: unknown): unknown {
     const fn = isPlainObject(next.function) ? { ...next.function } : next;
     if (!isPlainObject(fn.parameters) || !hasOwn(fn.parameters, "anyOf")) return tool;
 
-    const parameters = { ...fn.parameters };
-    delete parameters.anyOf;
-    fn.parameters = parameters;
+    const branches = fn.parameters.anyOf;
+    if (!Array.isArray(branches) || branches.length === 0) return tool;
+    if (!branches.every(objectCompatibleBranch)) return tool;
+
+    fn.parameters = mergeRootAnyOfBranches(fn.parameters, branches);
     if (fn !== next) next.function = fn;
     return next;
   });
