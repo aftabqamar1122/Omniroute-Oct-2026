@@ -125,6 +125,7 @@ import {
 import {
   classifyProviderBreakerResult,
   isAntigravityMissingProjectError,
+  isRequestShapeRejection,
   isProviderBreakerFailureStatus,
   resolveStreamReadinessClassificationError,
 } from "./chatPredicates";
@@ -2300,6 +2301,13 @@ async function handleSingleModelChat(
       // redispatch and repeat bootstrap within the same logical request.
       if (isAntigravityMissingProjectError(provider, result)) {
         markAntigravityMissingCloudCodeProject(credentials.connectionId);
+        return withSelectedConnectionHeader(result.response, credentials.connectionId);
+      }
+
+      // A 422 body-deserialization rejection describes THIS request's shape, not the
+      // account. Cooling the connection down would make every other client routed to
+      // the same (often single) account fail with the stale error for ~1 minute.
+      if (isRequestShapeRejection(result, provider)) {
         return withSelectedConnectionHeader(result.response, credentials.connectionId);
       }
 

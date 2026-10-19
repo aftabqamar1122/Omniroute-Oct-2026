@@ -86,6 +86,25 @@ export function classifyProviderBreakerResult(
     : "ignore";
 }
 
+/**
+ * Upstream 422 meaning "your JSON body does not match my schema" (e.g. xAI's
+ * `Failed to deserialize the JSON body into the target type: tools[7].type: ...`).
+ * That is a request-shape problem; it must not cool down the account.
+ */
+export function isRequestShapeRejection(
+  result: { status?: number; error?: unknown },
+  provider: string | null = null
+): boolean {
+  const status = Number(result.status);
+  if (status !== 400 && status !== 422) return false;
+  // xAI reports auth/quota as 401/403/429 — its 400/422 are always about the request body.
+  if (provider === "xai" || provider === "xai-oauth" || provider === "xao") return true;
+  const message = typeof result.error === "string" ? result.error : "";
+  return /failed to deserialize the json body|unknown variant `|missing field `|argument not supported|unknown content type|invalid request content/i.test(
+    message
+  );
+}
+
 export function isAntigravityMissingProjectError(
   provider: string,
   result: { status?: number; errorCode?: string; errorType?: string }
