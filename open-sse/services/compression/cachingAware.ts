@@ -8,6 +8,7 @@
 
 import {
   providerSupportsCaching,
+  providerUsesAutomaticPrefixCaching,
   type ConnectionCacheOverride,
 } from "../../utils/cacheControlPolicy.ts";
 
@@ -25,6 +26,7 @@ export interface CachingContext {
   provider: string | null;
   targetFormat: string | null;
   isCachingProvider: boolean;
+  usesAutomaticPrefixCaching: boolean;
 }
 
 export interface CacheAwareStrategy {
@@ -98,7 +100,15 @@ export function detectCachingContext(
     hasCacheControl: hasCacheControl(body),
     provider,
     targetFormat,
-    isCachingProvider: providerSupportsCaching(provider, targetFormat, context.connectionCacheOverride),
+    isCachingProvider: providerSupportsCaching(
+      provider,
+      targetFormat,
+      context.connectionCacheOverride
+    ),
+    usesAutomaticPrefixCaching: providerUsesAutomaticPrefixCaching(
+      provider,
+      context.connectionCacheOverride
+    ),
   };
 }
 

@@ -41,7 +41,9 @@ export function recordCompressionCacheStats(args: {
         model: args.effectiveModel ?? "",
         compressionMode: args.mode,
         cacheControlPresent: cacheContext.hasCacheControl,
-        estimatedCacheHit: cacheContext.hasCacheControl && cacheContext.isCachingProvider,
+        estimatedCacheHit:
+          cacheContext.usesAutomaticPrefixCaching ||
+          (cacheContext.hasCacheControl && cacheContext.isCachingProvider),
         tokensSavedCompression,
         tokensSavedCaching: 0,
         netSavings: tokensSavedCompression,

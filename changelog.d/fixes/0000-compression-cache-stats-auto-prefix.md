@@ -1,0 +1,1 @@
+- **fix(compression):** Record estimated cache hits for automatic-prefix caching providers (OpenAI, Codex, Azure) without requiring explicit `cache_control` markers, while retaining the marker requirement for explicit-breakpoint providers and avoiding fabricated caching token savings.
