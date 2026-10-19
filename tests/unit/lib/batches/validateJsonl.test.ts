@@ -57,7 +57,25 @@ test("validateJsonl: Anthropic params shape → ok=true (no url/method/body requ
   const result = validateJsonl(line + "\n", { endpoint: ENDPOINT });
   assert.ok(result.ok);
   assert.equal(result.uniqueCustomIds, 1);
+  assert.deepEqual(result.errors, []);
+  assert.deepEqual(result.preview, [JSON.parse(line)]);
 });
+
+for (const params of [[], [1], null, "invalid"]) {
+  test(`validateJsonl: rejects Anthropic params ${JSON.stringify(params)}`, () => {
+    const line = JSON.stringify({ custom_id: "anthropic-invalid", params });
+    const result = validateJsonl(line, { endpoint: ENDPOINT });
+    assert.equal(result.ok, false);
+    assert.deepEqual(result.errors, [
+      {
+        lineNumber: 1,
+        reason: "params must be an object (Anthropic batch shape)",
+        field: "params",
+      },
+    ]);
+    assert.deepEqual(result.preview, []);
+  });
+}
 
 test("validateJsonl: multiple valid lines → uniqueCustomIds matches count", () => {
   const lines = Array.from({ length: 5 }, (_, i) => makeLine(`req-${i + 1}`));
@@ -183,9 +201,15 @@ test("validateJsonl: byteSize matches UTF-8 byte length of input", () => {
 // ── Errors cap ────────────────────────────────────────────────────────────────
 
 test("validateJsonl: errors capped at 50 even with many invalid lines", () => {
-  const lines = Array.from({ length: 100 }, (_, i) => `{"custom_id":"req-${i}","method":"GET","url":"${ENDPOINT}","body":{}}`);
+  const lines = Array.from(
+    { length: 100 },
+    (_, i) => `{"custom_id":"req-${i}","method":"GET","url":"${ENDPOINT}","body":{}}`
+  );
   const result = validateJsonl(makeJsonl(lines), { endpoint: ENDPOINT });
-  assert.ok(result.errors.length <= 50, `errors should be capped at 50, got ${result.errors.length}`);
+  assert.ok(
+    result.errors.length <= 50,
+    `errors should be capped at 50, got ${result.errors.length}`
+  );
 });
 
 // ── body must be object (not array) — Array.isArray guard ─────────────────────
@@ -196,7 +220,7 @@ test("validateJsonl: rejects body that is an array (typeof []==='object' guard)"
   assert.ok(!result.ok, "should be invalid");
   assert.ok(
     result.errors.some((e) => e.field === "body"),
-    `should flag body field; errors=${JSON.stringify(result.errors)}`,
+    `should flag body field; errors=${JSON.stringify(result.errors)}`
   );
 });
 
