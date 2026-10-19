@@ -12685,7 +12685,8 @@
     "avgTtft": "TTFT trung bình",
     "avgTotal": "Tổng thời gian trung bình",
     "requestTelemetry": "Phân tích từ xa yêu cầu",
-    "requestTelemetryDescription": "Phân tích quy trình 7 giai đoạn trong 5 phút qua"
+    "requestTelemetryDescription": "Phân tích quy trình 7 giai đoạn trong 5 phút qua",
+    "windowSince": "Kể từ {date}"
   },
   "relay": {
     "title": "Relay Proxy không máy chủ",

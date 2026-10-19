@@ -12685,7 +12685,8 @@
     "avgTtft": "TTFT Médio",
     "avgTotal": "Total Médio",
     "requestTelemetry": "Telemetria de Solicitações",
-    "requestTelemetryDescription": "Detalhamento do pipeline de 7 fases (últimos 5 minutos)"
+    "requestTelemetryDescription": "Detalhamento do pipeline de 7 fases (últimos 5 minutos)",
+    "windowSince": "Desde {date}"
   },
   "relay": {
     "title": "Proxies de Relay Serverless",

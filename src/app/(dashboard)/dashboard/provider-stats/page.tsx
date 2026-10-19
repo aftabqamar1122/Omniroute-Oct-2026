@@ -93,6 +93,7 @@ export default function ProviderStatsPage() {
     comboMetrics: Record<string, unknown>;
     telemetry: Record<string, unknown>;
     toolLatency: Record<string, ToolLatencyStat>;
+    windowSince?: string;
   } | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [lastRefresh, setLastRefresh] = useState<Date | null>(null);
@@ -118,8 +119,24 @@ export default function ProviderStatsPage() {
     void (async () => {
       await fetchData();
     })();
-    const interval = setInterval(fetchData, 30000);
-    return () => clearInterval(interval);
+    // Skip ticks while the tab is hidden; a hidden tab gets nothing from a
+    // refetch, so the poll only costs the server. The interval keeps running —
+    // hosts that report a permanent "hidden" state without ever firing a
+    // visibilitychange still refresh, and a real background tab stops costing
+    // a computation every tick.
+    const interval = setInterval(() => {
+      if (document.visibilityState !== "visible") return;
+      void fetchData();
+    }, 30000);
+    const handleVisibilityChange = () => {
+      if (document.visibilityState !== "visible") return;
+      void fetchData();
+    };
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => {
+      clearInterval(interval);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
   }, [fetchData]);
 
   const handleSort = (key: SortKey) => {
@@ -256,10 +273,21 @@ export default function ProviderStatsPage() {
       {/* Provider Table */}
       <Card className="p-5">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold text-text-main flex items-center gap-2">
-            <span className="material-symbols-outlined text-[20px] text-primary">table_chart</span>
-            {t("providerBreakdown")}
-          </h2>
+          <div>
+            <h2 className="text-lg font-semibold text-text-main flex items-center gap-2">
+              <span className="material-symbols-outlined text-[20px] text-primary">
+                table_chart
+              </span>
+              {t("providerBreakdown")}
+            </h2>
+            {data.windowSince && (
+              <p className="text-xs text-text-muted mt-1">
+                {t("windowSince", {
+                  date: new Date(data.windowSince).toLocaleDateString(),
+                })}
+              </p>
+            )}
+          </div>
           <span className="text-xs text-text-muted">
             {t("providerCount", { count: activeProviders })}
           </span>
