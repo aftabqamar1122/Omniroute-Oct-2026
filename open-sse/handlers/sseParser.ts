@@ -169,7 +169,8 @@ export function parseSSEToOpenAIResponse(rawSSE, fallbackModel) {
     if (!payload || payload === "[DONE]") continue;
     try {
       const parsed = JSON.parse(payload);
-      if (Array.isArray(parsed?.choices)) {
+      if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) continue;
+      if (Array.isArray(parsed.choices)) {
         sawChoices = true;
       }
       chunks.push(parsed);
