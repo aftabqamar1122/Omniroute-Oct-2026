@@ -1,0 +1,1 @@
+- **fix(api):** Honor existing exact and wildcard model aliases in multipart audio transcriptions while preserving combo precedence and resolved-target API-key policy.
