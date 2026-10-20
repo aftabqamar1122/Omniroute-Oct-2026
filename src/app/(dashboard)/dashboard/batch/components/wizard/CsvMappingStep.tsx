@@ -82,7 +82,7 @@ export default function CsvMappingStep({
   const mappingValues = Object.values(mapping);
   const hasCustomId = mappingValues.includes("custom_id");
   const hasContent =
-    mappingValues.some((v) => v.startsWith("body.messages[")) ||
+    mappingValues.some((v) => v.startsWith("body.messages[") && v.endsWith(".content")) ||
     mappingValues.includes("body.input") ||
     mappingValues.includes("body.prompt");
 
