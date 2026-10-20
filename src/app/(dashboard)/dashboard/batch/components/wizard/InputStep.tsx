@@ -39,13 +39,20 @@ export default function InputStep({ input, onChange, destination }: InputStepPro
   // B-2b — synchronous stale-proof guard for concurrent drops/picks in the same
   // event-loop tick (React state lags behind dispatches within a tick).
   const isReadingRef = useRef(false);
+  const inputRevisionRef = useRef(0);
   const [csvJsonl, setCsvJsonl] = useState<string | null>(null);
 
   const isJsonl = input.kind === "jsonl";
   const isCsv = input.kind === "csv";
 
   function handleKindChange(kind: "jsonl" | "csv") {
-    onChange({ kind, fileName: null, rawContent: null, csvMapping: kind === "csv" ? {} : undefined });
+    inputRevisionRef.current += 1;
+    onChange({
+      kind,
+      fileName: null,
+      rawContent: null,
+      csvMapping: kind === "csv" ? {} : undefined,
+    });
     setCsvJsonl(null);
   }
 
@@ -55,6 +62,7 @@ export default function InputStep({ input, onChange, destination }: InputStepPro
     // cannot both pass. State mirror is for UI only.
     if (isReadingRef.current) return;
     isReadingRef.current = true;
+    const inputRevision = inputRevisionRef.current;
     const expectedExt = isJsonl ? ".jsonl" : ".csv";
     if (!file.name.toLowerCase().endsWith(expectedExt)) {
       // Soft warning — don't block, let validation catch it
@@ -62,6 +70,8 @@ export default function InputStep({ input, onChange, destination }: InputStepPro
     setIsReading(true);
     try {
       const content = await readFileContent(file);
+      // A format change invalidates the pending file without skipping read cleanup.
+      if (inputRevision !== inputRevisionRef.current) return;
       onChange({
         kind: input.kind,
         fileName: file.name,
