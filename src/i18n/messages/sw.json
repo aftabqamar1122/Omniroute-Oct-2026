@@ -15073,5 +15073,8 @@
     "importButton": "Leta",
     "importFailed": "Kuleta kumeshindwa.",
     "importSuccess": "Akaunti {connections} na nodi {nodes} za watoa huduma zimeletwa; {skipped} zimerukwa."
+  },
+  "logExport": {
+    "startFromCurrentPosition": "Anza kutoka nafasi ya sasa (ruka kumbukumbu zilizopo)"
   }
 }

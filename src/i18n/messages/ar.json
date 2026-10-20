@@ -15073,5 +15073,8 @@
     "importButton": "استيراد",
     "importFailed": "فشل الاستيراد.",
     "importSuccess": "تم استيراد {connections} حسابات و{nodes} عُقد مزوّدين؛ وتخطي {skipped}."
+  },
+  "logExport": {
+    "startFromCurrentPosition": "البدء من الموضع الحالي (تخطي السجلات الحالية)"
   }
 }

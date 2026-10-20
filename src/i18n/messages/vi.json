@@ -15073,5 +15073,8 @@
     "importButton": "Nhập",
     "importFailed": "Nhập thất bại.",
     "importSuccess": "Đã nhập {connections} tài khoản và {nodes} nút nhà cung cấp; bỏ qua {skipped}."
+  },
+  "logExport": {
+    "startFromCurrentPosition": "Bắt đầu từ vị trí hiện tại (bỏ qua nhật ký hiện có)"
   }
 }

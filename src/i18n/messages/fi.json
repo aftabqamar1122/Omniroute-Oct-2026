@@ -15073,5 +15073,8 @@
     "importButton": "Tuo",
     "importFailed": "Tuonti epäonnistui.",
     "importSuccess": "Tuotiin {connections} tiliä ja {nodes} palveluntarjoajasolmua; {skipped} ohitettiin."
+  },
+  "logExport": {
+    "startFromCurrentPosition": "Aloita nykyisestä kohdasta (ohita olemassa olevat lokit)"
   }
 }

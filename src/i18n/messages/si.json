@@ -15073,5 +15073,8 @@
     "importButton": "ආයාත කරන්න",
     "importFailed": "ආයාතය අසාර්ථක විය.",
     "importSuccess": "ගිණුම් {connections}ක් සහ සපයන්නා නෝඩ් {nodes}ක් ආයාත කළා; {skipped}ක් මඟ හැරියා."
+  },
+  "logExport": {
+    "startFromCurrentPosition": "වත්මන් ස්ථානයෙන් ආරම්භ කරන්න (පවතින ලොග් මඟ හරින්න)"
   }
 }

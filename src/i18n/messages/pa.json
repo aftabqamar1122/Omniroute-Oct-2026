@@ -15073,5 +15073,8 @@
     "importButton": "ਆਯਾਤ ਕਰੋ",
     "importFailed": "ਆਯਾਤ ਅਸਫਲ ਰਿਹਾ।",
     "importSuccess": "{connections} ਖਾਤੇ ਅਤੇ {nodes} ਪ੍ਰਦਾਤਾ ਨੋਡ ਆਯਾਤ ਹੋਏ; {skipped} ਛੱਡੇ ਗਏ।"
+  },
+  "logExport": {
+    "startFromCurrentPosition": "ਮੌਜੂਦਾ ਸਥਿਤੀ ਤੋਂ ਸ਼ੁਰੂ ਕਰੋ (ਮੌਜੂਦਾ ਲੌਗ ਛੱਡੋ)"
   }
 }

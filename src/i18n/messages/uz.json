@@ -15073,5 +15073,8 @@
     "importButton": "Import qilish",
     "importFailed": "Import muvaffaqiyatsiz tugadi.",
     "importSuccess": "{connections} ta hisob va {nodes} ta provayder tuguni import qilindi; {skipped} ta o'tkazib yuborildi."
+  },
+  "logExport": {
+    "startFromCurrentPosition": "Joriy joydan boshlash (mavjud jurnallarni o'tkazib yuborish)"
   }
 }

@@ -15073,5 +15073,8 @@
     "importButton": "I-import",
     "importFailed": "Nabigo ang pag-import.",
     "importSuccess": "Na-import ang {connections} account at {nodes} provider node; nilaktawan ang {skipped}."
+  },
+  "logExport": {
+    "startFromCurrentPosition": "Magsimula sa kasalukuyang posisyon (laktawan ang mga umiiral na log)"
   }
 }

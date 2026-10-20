@@ -15073,5 +15073,8 @@
     "importButton": "आयात करा",
     "importFailed": "आयात अयशस्वी.",
     "importSuccess": "{connections} खाती आणि {nodes} प्रदाता नोड आयात झाले; {skipped} वगळले."
+  },
+  "logExport": {
+    "startFromCurrentPosition": "सध्याच्या स्थानापासून सुरू करा (विद्यमान लॉग वगळा)"
   }
 }

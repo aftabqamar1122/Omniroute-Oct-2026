@@ -15073,5 +15073,8 @@
     "importButton": "Ներմուծել",
     "importFailed": "Ներմուծումը ձախողվեց։",
     "importSuccess": "Ներմուծվեց {connections} հաշիվ և {nodes} մատակարարի հանգույց. բաց թողնվեց՝ {skipped}։"
+  },
+  "logExport": {
+    "startFromCurrentPosition": "Սկսել ընթացիկ դիրքից (բաց թողնել առկա մատյանները)"
   }
 }

@@ -15073,5 +15073,8 @@
     "importButton": "Importovat",
     "importFailed": "Import se nezdařil.",
     "importSuccess": "Importováno {connections} účtů a {nodes} uzlů poskytovatelů; přeskočeno {skipped}."
+  },
+  "logExport": {
+    "startFromCurrentPosition": "Začít od aktuální pozice (přeskočit existující protokoly)"
   }
 }

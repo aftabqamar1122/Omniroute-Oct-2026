@@ -15073,5 +15073,8 @@
     "importButton": "ייבוא",
     "importFailed": "הייבוא נכשל.",
     "importSuccess": "יובאו {connections} חשבונות ו-{nodes} צמתי ספק; דולגו {skipped}."
+  },
+  "logExport": {
+    "startFromCurrentPosition": "התחלה מהמיקום הנוכחי (דילוג על יומנים קיימים)"
   }
 }

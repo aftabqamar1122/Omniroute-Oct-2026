@@ -15073,5 +15073,8 @@
     "importButton": "దిగుమతి చేయండి",
     "importFailed": "దిగుమతి విఫలమైంది.",
     "importSuccess": "{connections} ఖాతాలు, {nodes} ప్రొవైడర్ నోడ్‌లు దిగుమతి అయ్యాయి; {skipped} దాటవేయబడ్డాయి."
+  },
+  "logExport": {
+    "startFromCurrentPosition": "ప్రస్తుత స్థానం నుండి ప్రారంభించండి (ఇప్పటికే ఉన్న లాగ్‌లను దాటవేయండి)"
   }
 }

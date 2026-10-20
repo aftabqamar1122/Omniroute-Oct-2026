@@ -15073,5 +15073,8 @@
     "importButton": "ورود",
     "importFailed": "وارد کردن ناموفق بود.",
     "importSuccess": "{connections} حساب و {nodes} گره ارائه‌دهنده وارد شد؛ {skipped} رد شد."
+  },
+  "logExport": {
+    "startFromCurrentPosition": "شروع از موقعیت فعلی (رد کردن گزارش‌های موجود)"
   }
 }

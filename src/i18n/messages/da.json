@@ -15073,5 +15073,8 @@
     "importButton": "Importér",
     "importFailed": "Importen mislykkedes.",
     "importSuccess": "Importerede {connections} konti og {nodes} udbydernoder; {skipped} sprunget over."
+  },
+  "logExport": {
+    "startFromCurrentPosition": "Start fra den aktuelle position (spring eksisterende logfiler over)"
   }
 }

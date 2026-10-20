@@ -15073,5 +15073,8 @@
     "importButton": "Імпортувати",
     "importFailed": "Помилка імпорту.",
     "importSuccess": "Імпортовано облікових записів: {connections}, вузлів провайдерів: {nodes}; пропущено: {skipped}."
+  },
+  "logExport": {
+    "startFromCurrentPosition": "Почати з поточної позиції (пропустити наявні журнали)"
   }
 }

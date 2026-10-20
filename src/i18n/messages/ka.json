@@ -15073,5 +15073,8 @@
     "importButton": "იმპორტი",
     "importFailed": "იმპორტი ვერ მოხერხდა.",
     "importSuccess": "იმპორტირებულია {connections} ანგარიში და {nodes} პროვაიდერის კვანძი; გამოტოვებულია {skipped}."
+  },
+  "logExport": {
+    "startFromCurrentPosition": "დაწყება მიმდინარე პოზიციიდან (არსებული ჟურნალების გამოტოვება)"
   }
 }

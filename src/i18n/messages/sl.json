@@ -15073,5 +15073,8 @@
     "importButton": "Uvozi",
     "importFailed": "Uvoz ni uspel.",
     "importSuccess": "Uvoženih {connections} računov in {nodes} vozlišč ponudnikov; preskočenih {skipped}."
+  },
+  "logExport": {
+    "startFromCurrentPosition": "Začni na trenutnem mestu (preskoči obstoječe dnevnike)"
   }
 }

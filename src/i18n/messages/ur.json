@@ -15073,5 +15073,8 @@
     "importButton": "درآمد",
     "importFailed": "درآمد ناکام رہی۔",
     "importSuccess": "{connections} اکاؤنٹس اور {nodes} فراہم کنندہ نوڈز درآمد ہوئے؛ {skipped} چھوڑ دیے گئے۔"
+  },
+  "logExport": {
+    "startFromCurrentPosition": "موجودہ مقام سے شروع کریں (موجودہ لاگز چھوڑ دیں)"
   }
 }

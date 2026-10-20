@@ -15073,5 +15073,8 @@
     "importButton": "Импортировать",
     "importFailed": "Ошибка импорта.",
     "importSuccess": "Импортировано аккаунтов: {connections}, узлов провайдеров: {nodes}; пропущено: {skipped}."
+  },
+  "logExport": {
+    "startFromCurrentPosition": "Начать с текущей позиции (пропустить существующие журналы)"
   }
 }

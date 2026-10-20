@@ -15073,5 +15073,8 @@
     "importButton": "Importálás",
     "importFailed": "Az importálás sikertelen.",
     "importSuccess": "{connections} fiók és {nodes} szolgáltatói csomópont importálva; {skipped} kihagyva."
+  },
+  "logExport": {
+    "startFromCurrentPosition": "Kezdés az aktuális pozíciótól (meglévő naplók kihagyása)"
   }
 }

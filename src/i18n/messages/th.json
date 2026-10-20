@@ -15073,5 +15073,8 @@
     "importButton": "นำเข้า",
     "importFailed": "นำเข้าไม่สำเร็จ",
     "importSuccess": "นำเข้า {connections} บัญชีและ {nodes} โหนดผู้ให้บริการแล้ว ข้าม {skipped} รายการ"
+  },
+  "logExport": {
+    "startFromCurrentPosition": "เริ่มจากตำแหน่งปัจจุบัน (ข้ามบันทึกที่มีอยู่)"
   }
 }

@@ -15073,5 +15073,8 @@
     "importButton": "Kó wọlé",
     "importFailed": "Ìkówọlé kùnà.",
     "importSuccess": "A kó àkọọ́lẹ̀ {connections} àti node olùpèsè {nodes} wọlé; a fò {skipped}."
+  },
+  "logExport": {
+    "startFromCurrentPosition": "Bẹ̀rẹ̀ láti ipò ìsinsìnyí (fo àwọn àkọsílẹ̀ tó wà tẹ́lẹ̀)"
   }
 }

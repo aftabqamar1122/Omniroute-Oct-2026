@@ -15073,5 +15073,8 @@
     "importButton": "Εισαγωγή",
     "importFailed": "Η εισαγωγή απέτυχε.",
     "importSuccess": "Εισήχθησαν {connections} λογαριασμοί και {nodes} κόμβοι παρόχων· {skipped} παραλείφθηκαν."
+  },
+  "logExport": {
+    "startFromCurrentPosition": "Έναρξη από την τρέχουσα θέση (παράλειψη υπαρχόντων αρχείων καταγραφής)"
   }
 }

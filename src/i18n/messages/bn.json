@@ -15073,5 +15073,8 @@
     "importButton": "ইমপোর্ট করুন",
     "importFailed": "ইমপোর্ট ব্যর্থ হয়েছে।",
     "importSuccess": "{connections}টি অ্যাকাউন্ট ও {nodes}টি প্রদানকারী নোড ইমপোর্ট হয়েছে; {skipped}টি এড়ানো হয়েছে।"
+  },
+  "logExport": {
+    "startFromCurrentPosition": "বর্তমান অবস্থান থেকে শুরু করুন (বিদ্যমান লগ বাদ দিন)"
   }
 }

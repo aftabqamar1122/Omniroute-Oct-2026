@@ -15073,5 +15073,8 @@
     "importButton": "Shigo da",
     "importFailed": "Shigowa ta gaza.",
     "importSuccess": "An shigo da asusu {connections} da nodes {nodes} na masu samarwa; an tsallake {skipped}."
+  },
+  "logExport": {
+    "startFromCurrentPosition": "Fara daga matsayin yanzu (tsallake bayanan da ke akwai)"
   }
 }

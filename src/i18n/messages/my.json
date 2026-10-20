@@ -15073,5 +15073,8 @@
     "importButton": "တင်သွင်းရန်",
     "importFailed": "တင်သွင်းမှု မအောင်မြင်ပါ။",
     "importSuccess": "အကောင့် {connections} ခုနှင့် ဝန်ဆောင်မှုပေးသူ node {nodes} ခု တင်သွင်းပြီး {skipped} ခု ကျော်ခဲ့သည်။"
+  },
+  "logExport": {
+    "startFromCurrentPosition": "လက်ရှိနေရာမှ စတင်ပါ (ရှိပြီးသား မှတ်တမ်းများကို ကျော်ပါ)"
   }
 }

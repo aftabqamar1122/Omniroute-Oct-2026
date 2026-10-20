@@ -15073,5 +15073,8 @@
     "importButton": "Importieren",
     "importFailed": "Import fehlgeschlagen.",
     "importSuccess": "{connections} Konten und {nodes} Anbieterknoten importiert; {skipped} übersprungen."
+  },
+  "logExport": {
+    "startFromCurrentPosition": "Ab aktueller Position starten (vorhandene Protokolle überspringen)"
   }
 }

@@ -15073,5 +15073,8 @@
     "importButton": "Bubata",
     "importFailed": "Mbubata dara.",
     "importSuccess": "E bubatara akaụntụ {connections} na nodes {nodes} nke ndị na-eweta ọrụ; a wụfere {skipped}."
+  },
+  "logExport": {
+    "startFromCurrentPosition": "Malite site n'ọnọdụ ugbu a (wụpụ ndekọ ndị dị ugbu a)"
   }
 }

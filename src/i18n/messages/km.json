@@ -15073,5 +15073,8 @@
     "importButton": "នាំចូល",
     "importFailed": "ការនាំចូលបរាជ័យ។",
     "importSuccess": "បាននាំចូលគណនី {connections} និងថ្នាំងអ្នកផ្តល់សេវា {nodes}; បានរំលង {skipped}។"
+  },
+  "logExport": {
+    "startFromCurrentPosition": "ចាប់ផ្ដើមពីទីតាំងបច្ចុប្បន្ន (រំលងកំណត់ហេតុដែលមានស្រាប់)"
   }
 }

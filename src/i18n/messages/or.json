@@ -15073,5 +15073,8 @@
     "importButton": "ଆମଦାନି କରନ୍ତୁ",
     "importFailed": "ଆମଦାନି ବିଫଳ ହେଲା।",
     "importSuccess": "{connections} ଆକାଉଣ୍ଟ ଏବଂ {nodes} ପ୍ରଦାତା ନୋଡ ଆମଦାନି ହେଲା; {skipped} ଛଡ଼ାଗଲା।"
+  },
+  "logExport": {
+    "startFromCurrentPosition": "ବର୍ତ୍ତମାନ ସ୍ଥାନରୁ ଆରମ୍ଭ କରନ୍ତୁ (ବିଦ୍ୟମାନ ଲଗ୍ ଛାଡ଼ନ୍ତୁ)"
   }
 }

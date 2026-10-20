@@ -15073,5 +15073,8 @@
     "importButton": "Importer",
     "importFailed": "Échec de l'importation.",
     "importSuccess": "{connections} comptes et {nodes} nœuds de fournisseur importés ; {skipped} ignorés."
+  },
+  "logExport": {
+    "startFromCurrentPosition": "Commencer à la position actuelle (ignorer les journaux existants)"
   }
 }

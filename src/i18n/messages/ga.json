@@ -15073,5 +15073,8 @@
     "importButton": "Iompórtáil",
     "importFailed": "Theip ar an iompórtáil.",
     "importSuccess": "Iompórtáladh {connections} cuntas agus {nodes} nód soláthraí; scipeáladh {skipped}."
+  },
+  "logExport": {
+    "startFromCurrentPosition": "Tosaigh ón suíomh reatha (scipeáil na logaí atá ann)"
   }
 }

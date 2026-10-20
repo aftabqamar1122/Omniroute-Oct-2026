@@ -15073,5 +15073,8 @@
     "importButton": "આયાત કરો",
     "importFailed": "આયાત નિષ્ફળ.",
     "importSuccess": "{connections} એકાઉન્ટ્સ અને {nodes} પ્રદાતા નોડ્સ આયાત થયા; {skipped} છોડ્યા."
+  },
+  "logExport": {
+    "startFromCurrentPosition": "વર્તમાન સ્થાનથી શરૂ કરો (હાલના લોગ છોડો)"
   }
 }

@@ -15073,5 +15073,8 @@
     "importButton": "Impor",
     "importFailed": "Impor gagal.",
     "importSuccess": "{connections} akun dan {nodes} node penyedia diimpor; {skipped} dilewati."
+  },
+  "logExport": {
+    "startFromCurrentPosition": "Mulai dari posisi saat ini (lewati log yang ada)"
   }
 }

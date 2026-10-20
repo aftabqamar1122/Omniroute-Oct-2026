@@ -15073,5 +15073,8 @@
     "importButton": "ಆಮದು ಮಾಡಿ",
     "importFailed": "ಆಮದು ವಿಫಲವಾಗಿದೆ.",
     "importSuccess": "{connections} ಖಾತೆಗಳು ಮತ್ತು {nodes} ಪೂರೈಕೆದಾರ ನೋಡ್‌ಗಳನ್ನು ಆಮದು ಮಾಡಲಾಗಿದೆ; {skipped} ಬಿಟ್ಟುಬಿಡಲಾಗಿದೆ."
+  },
+  "logExport": {
+    "startFromCurrentPosition": "ಪ್ರಸ್ತುತ ಸ್ಥಾನದಿಂದ ಪ್ರಾರಂಭಿಸಿ (ಅಸ್ತಿತ್ವದಲ್ಲಿರುವ ಲಾಗ್‌ಗಳನ್ನು ಬಿಟ್ಟುಬಿಡಿ)"
   }
 }

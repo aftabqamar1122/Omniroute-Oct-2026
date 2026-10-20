@@ -15073,5 +15073,8 @@
     "importButton": "Import",
     "importFailed": "Import gagal.",
     "importSuccess": "{connections} akaun dan {nodes} nod penyedia diimport; {skipped} dilangkau."
+  },
+  "logExport": {
+    "startFromCurrentPosition": "Mula dari kedudukan semasa (langkau log sedia ada)"
   }
 }

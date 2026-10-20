@@ -15073,5 +15073,8 @@
     "importButton": "가져오기",
     "importFailed": "가져오기에 실패했습니다.",
     "importSuccess": "계정 {connections}개와 공급자 노드 {nodes}개를 가져왔습니다. {skipped}개는 건너뛰었습니다."
+  },
+  "logExport": {
+    "startFromCurrentPosition": "현재 위치에서 시작 (기존 로그 건너뛰기)"
   }
 }

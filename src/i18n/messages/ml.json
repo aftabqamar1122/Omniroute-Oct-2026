@@ -15073,5 +15073,8 @@
     "importButton": "ഇറക്കുമതി ചെയ്യുക",
     "importFailed": "ഇറക്കുമതി പരാജയപ്പെട്ടു.",
     "importSuccess": "{connections} അക്കൗണ്ടുകളും {nodes} ദാതാവ് നോഡുകളും ഇറക്കുമതി ചെയ്തു; {skipped} ഒഴിവാക്കി."
+  },
+  "logExport": {
+    "startFromCurrentPosition": "നിലവിലെ സ്ഥാനത്ത് നിന്ന് ആരംഭിക്കുക (നിലവിലുള്ള ലോഗുകൾ ഒഴിവാക്കുക)"
   }
 }

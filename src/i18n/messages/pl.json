@@ -15073,5 +15073,8 @@
     "importButton": "Importuj",
     "importFailed": "Import nie powiódł się.",
     "importSuccess": "Zaimportowano kont: {connections}, węzłów dostawców: {nodes}; pominięto: {skipped}."
+  },
+  "logExport": {
+    "startFromCurrentPosition": "Zacznij od bieżącej pozycji (pomiń istniejące dzienniki)"
   }
 }

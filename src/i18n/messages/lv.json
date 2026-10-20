@@ -15073,5 +15073,8 @@
     "importButton": "Importēt",
     "importFailed": "Importēšana neizdevās.",
     "importSuccess": "Importēti {connections} konti un {nodes} pakalpojumu sniedzēju mezgli; izlaisti {skipped}."
+  },
+  "logExport": {
+    "startFromCurrentPosition": "Sākt no pašreizējās pozīcijas (izlaist esošos žurnālus)"
   }
 }

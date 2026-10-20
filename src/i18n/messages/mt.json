@@ -15073,5 +15073,8 @@
     "importButton": "Importa",
     "importFailed": "L-importazzjoni falliet.",
     "importSuccess": "Ġew importati {connections} kontijiet u {nodes} nodi tal-fornituri; {skipped} inqabżu."
+  },
+  "logExport": {
+    "startFromCurrentPosition": "Ibda mill-pożizzjoni attwali (aqbeż ir-reġistri eżistenti)"
   }
 }

@@ -15073,5 +15073,8 @@
     "importButton": "İçe aktar",
     "importFailed": "İçe aktarma başarısız oldu.",
     "importSuccess": "{connections} hesap ve {nodes} sağlayıcı düğümü içe aktarıldı; {skipped} atlandı."
+  },
+  "logExport": {
+    "startFromCurrentPosition": "Geçerli konumdan başla (mevcut günlükleri atla)"
   }
 }

@@ -15073,5 +15073,8 @@
     "importButton": "Importera",
     "importFailed": "Importen misslyckades.",
     "importSuccess": "Importerade {connections} konton och {nodes} leverantörsnoder; {skipped} hoppades över."
+  },
+  "logExport": {
+    "startFromCurrentPosition": "Börja från aktuell position (hoppa över befintliga loggar)"
   }
 }

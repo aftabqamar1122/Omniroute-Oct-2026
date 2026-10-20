@@ -15073,5 +15073,8 @@
     "importButton": "İdxal et",
     "importFailed": "İdxal uğursuz oldu.",
     "importSuccess": "{connections} hesab və {nodes} provayder qovşağı idxal edildi; {skipped} ötürüldü."
+  },
+  "logExport": {
+    "startFromCurrentPosition": "Cari mövqedən başla (mövcud qeydləri ötür)"
   }
 }

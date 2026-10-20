@@ -15073,5 +15073,8 @@
     "importButton": "Uvezi",
     "importFailed": "Uvoz nije uspio.",
     "importSuccess": "Uvezeno {connections} računa i {nodes} čvorova provajdera; preskočeno {skipped}."
+  },
+  "logExport": {
+    "startFromCurrentPosition": "Počni od trenutne pozicije (preskoči postojeće zapise)"
   }
 }

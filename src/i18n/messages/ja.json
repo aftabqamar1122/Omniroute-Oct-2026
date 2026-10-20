@@ -15073,5 +15073,8 @@
     "importButton": "インポート",
     "importFailed": "インポートに失敗しました。",
     "importSuccess": "{connections} 件のアカウントと {nodes} 件のプロバイダーノードをインポートしました。{skipped} 件はスキップしました。"
+  },
+  "logExport": {
+    "startFromCurrentPosition": "現在の位置から開始（既存のログをスキップ）"
   }
 }
