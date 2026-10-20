@@ -18,6 +18,10 @@ import {
 import { resolveDynamicAudioProviders } from "@/app/api/v1/_shared/audioProviderNodes";
 import { errorResponse } from "@omniroute/open-sse/utils/error.ts";
 import { HTTP_STATUS } from "@omniroute/open-sse/config/constants.ts";
+import { getCombinedModelAliases } from "@/sse/services/model";
+import { resolveModel } from "@omniroute/open-sse/services/wildcardRouter.ts";
+import { resolveModelAliasFromMap } from "@omniroute/open-sse/services/model.ts";
+import { isModelAllowedForKey } from "@/lib/db/apiKeys";
 import { enforceApiKeyPolicy } from "@/shared/utils/apiKeyPolicy";
 import {
   createComboTargetKeyGate,
@@ -332,9 +336,27 @@ export async function POST(request) {
     }
   }
 
+  // Reuse the same DB/settings exact and wildcard alias stores as chat. Stored
+  // combos above retain precedence, and unknown ids keep audio's own parser.
+  const aliases = await getCombinedModelAliases();
+  const wildcardAliases = Object.entries(aliases)
+    .filter(([pattern, target]) => /[*?]/.test(pattern) && typeof target === "string")
+    .map(([pattern, target]) => ({ pattern, target: target as string }));
+  const exact = resolveModelAliasFromMap(modelStr, aliases);
+  const resolvedModel = exact
+    ? `${exact.provider}/${exact.model}`
+    : resolveModel(modelStr, {}, wildcardAliases);
+  if (
+    resolvedModel !== modelStr &&
+    policy.apiKey &&
+    !(await isModelAllowedForKey(policy.apiKey, modelStr, resolvedModel))
+  ) {
+    return errorResponse(HTTP_STATUS.FORBIDDEN, "API key is not allowed to use the resolved model");
+  }
+
   return transcribeWithModel(
-    formData,
-    modelStr,
+    resolvedModel === modelStr ? formData : withModel(formData, resolvedModel),
+    resolvedModel,
     startTime,
     apiKeyId,
     apiKeyName,
