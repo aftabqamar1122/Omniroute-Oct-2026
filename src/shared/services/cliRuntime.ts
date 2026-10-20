@@ -369,7 +369,18 @@ export const normalizeCliToolId = (toolId: string): string => {
   return CLI_TOOL_ALIASES[normalized] || normalized;
 };
 
-const isWindows = () => process.platform === "win32";
+/**
+ * #17157: runtime platform check.
+ * Bundlers (Turbopack in `next build` / SWC) constant-fold a bare `process.platform`
+ * member expression to the Linux build host ("linux") and prune the Windows branches
+ * in `getKnownToolPaths` and `locateCommand` as dead code. Reading
+ * `(globalThis as any).process?.platform` and `os.platform()` at runtime prevents
+ * build-time dead-code elimination.
+ */
+export const isWindows = (): boolean => {
+  const platform = (globalThis as any).process?.platform;
+  return platform === "win32" || (typeof os !== "undefined" && os.platform() === "win32");
+};
 
 /**
  * (#510) Normalize MSYS2/Git-Bash style paths to Windows-native paths.
