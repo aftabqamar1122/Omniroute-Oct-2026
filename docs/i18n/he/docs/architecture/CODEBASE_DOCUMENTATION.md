@@ -447,7 +447,7 @@ open-sse/
 ├── types.d.ts
 ├── config/                 רישומי ספקים, פרופילי כותרות, זהות, …
 ├── handlers/               מטפלי בקשות (צ'אט, הטמעות, שמע, תמונה, …)
-├── executors/              150 מודולי הרצה של ספקים (מחלקות הרצה + כלי עזר לכל ספק)
+├── executors/              156 מודולי הרצה של ספקים (מחלקות הרצה + כלי עזר לכל ספק)
 ├── translator/             המרת פורמטים (OpenAI ↔ Claude ↔ Gemini ↔ Cursor ↔ Kiro)
 ├── transformer/            ממיר הזרמה של Responses API ↔ Chat Completions
 ├── services/               יותר מ-80 מודולי שירות (שילובים, גיבוי, מכסות, זהות, …)

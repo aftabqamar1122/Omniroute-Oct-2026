@@ -445,7 +445,7 @@ open-sse/
 ├── types.d.ts
 ├── config/                 プロバイダーレジストリ、ヘッダープロファイル、ID など
 ├── handlers/               リクエストハンドラー（チャット、埋め込み、音声、画像など）
-├── executors/              150 個のプロバイダーエグゼキューターモジュール（エグゼキュータークラス + プロバイダーごとのヘルパー）
+├── executors/              156 個のプロバイダーエグゼキューターモジュール（エグゼキュータークラス + プロバイダーごとのヘルパー）
 ├── translator/             形式変換（OpenAI ↔ Claude ↔ Gemini ↔ Cursor ↔ Kiro）
 ├── transformer/            Responses API ↔ Chat Completions ストリームトランスフォーマー
 ├── services/               80 以上のサービスモジュール（コンボ、フォールバック、クォータ、ID など）

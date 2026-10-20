@@ -433,7 +433,7 @@ open-sse/
 ├── types.d.ts
 ├── config/                 提供者注册表、请求头配置、身份标识等
 ├── handlers/               请求处理器（聊天、嵌入、音频、图像等）
-├── executors/              150 个提供者执行器模块（执行器类 + 各提供者辅助模块）
+├── executors/              156 个提供者执行器模块（执行器类 + 各提供者辅助模块）
 ├── translator/             格式转换（OpenAI ↔ Claude ↔ Gemini ↔ Cursor ↔ Kiro）
 ├── transformer/            Responses API ↔ Chat Completions 流转换器
 ├── services/               80+ 个服务模块（组合、回退、配额、身份标识等）

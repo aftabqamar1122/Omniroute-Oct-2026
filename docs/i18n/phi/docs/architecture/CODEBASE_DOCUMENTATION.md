@@ -444,7 +444,7 @@ open-sse/
 ├── types.d.ts
 ├── config/                 Mga registry ng provider, profile ng header, identity, …
 ├── handlers/               Mga handler ng request (chat, embedding, audio, image, …)
-├── executors/              150 module ng provider executor (mga executor class + helper para sa bawat provider)
+├── executors/              156 module ng provider executor (mga executor class + helper para sa bawat provider)
 ├── translator/             Pag-convert ng format (OpenAI ↔ Claude ↔ Gemini ↔ Cursor ↔ Kiro)
 ├── transformer/            Transformer ng stream ng Responses API ↔ Chat Completions
 ├── services/               80+ module ng serbisyo (mga combo, fallback, quota, identity, …)

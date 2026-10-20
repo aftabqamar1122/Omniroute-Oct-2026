@@ -447,7 +447,7 @@ open-sse/
 ├── types.d.ts
 ├── config/                 Registri pružalaca, profili zaglavlja, identitet, …
 ├── handlers/               Rukovaoci zahtjevima (razgovor, ugrađivanja, zvuk, slika, …)
-├── executors/              150 modula izvršilaca pružalaca (klase izvršilaca + pomoćni moduli po pružaocu)
+├── executors/              156 modula izvršilaca pružalaca (klase izvršilaca + pomoćni moduli po pružaocu)
 ├── translator/             Konverzija formata (OpenAI ↔ Claude ↔ Gemini ↔ Cursor ↔ Kiro)
 ├── transformer/            Transformator toka Responses API ↔ Chat Completions
 ├── services/               Više od 80 servisnih modula (kombinacije, rezervne opcije, kvote, identitet, …)

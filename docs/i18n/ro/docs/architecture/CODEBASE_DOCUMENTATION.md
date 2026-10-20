@@ -447,7 +447,7 @@ open-sse/
 ├── types.d.ts
 ├── config/                 Registre de furnizori, profiluri de anteturi, identitate, …
 ├── handlers/               Gestionare cereri (chat, încorporări, audio, imagini, …)
-├── executors/              150 de module de execuție pentru furnizori (clase de execuție + utilitare per furnizor)
+├── executors/              156 de module de execuție pentru furnizori (clase de execuție + utilitare per furnizor)
 ├── translator/             Conversia formatelor (OpenAI ↔ Claude ↔ Gemini ↔ Cursor ↔ Kiro)
 ├── transformer/            Transformator de flux Responses API ↔ Chat Completions
 ├── services/               Peste 80 de module de servicii (combinații, soluții de rezervă, cote, identitate, …)

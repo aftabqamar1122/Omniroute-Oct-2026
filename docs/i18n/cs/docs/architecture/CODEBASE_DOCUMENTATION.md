@@ -447,7 +447,7 @@ open-sse/
 ├── types.d.ts
 ├── config/                 Registry poskytovatelů, profily hlaviček, identita, …
 ├── handlers/               Obslužné rutiny požadavků (chat, embeddingy, zvuk, obrázky, …)
-├── executors/              150 modulů exekutorů poskytovatelů (třídy exekutorů + pomocné funkce pro jednotlivé poskytovatele)
+├── executors/              156 modulů exekutorů poskytovatelů (třídy exekutorů + pomocné funkce pro jednotlivé poskytovatele)
 ├── translator/             Převod formátů (OpenAI ↔ Claude ↔ Gemini ↔ Cursor ↔ Kiro)
 ├── transformer/            Transformátor streamu Responses API ↔ Chat Completions
 ├── services/               Více než 80 modulů služeb (kombinace, záložní postupy, kvóty, identita, …)

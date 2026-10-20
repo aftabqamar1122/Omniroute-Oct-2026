@@ -448,7 +448,7 @@ open-sse/
 ├── types.d.ts
 ├── config/                 提供者登錄檔、標頭設定檔、身分識別，…
 ├── handlers/               請求處理器（聊天、嵌入、音訊、影像，…）
-├── executors/              150 個提供者執行器模組（執行器類別 + 各提供者輔助工具）
+├── executors/              156 個提供者執行器模組（執行器類別 + 各提供者輔助工具）
 ├── translator/             格式轉換（OpenAI ↔ Claude ↔ Gemini ↔ Cursor ↔ Kiro）
 ├── transformer/            Responses API ↔ Chat Completions 串流轉換器
 ├── services/               80+ 個服務模組（組合、備援、配額、身分識別，…）

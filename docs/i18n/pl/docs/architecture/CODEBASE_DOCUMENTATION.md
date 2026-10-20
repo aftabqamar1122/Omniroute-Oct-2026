@@ -454,7 +454,7 @@ open-sse/
 ├── types.d.ts
 ├── config/                 Rejestry dostawców, profile nagłówków, tożsamość, …
 ├── handlers/               Procedury obsługi żądań (czat, osadzanie, audio, obrazy, …)
-├── executors/              150 modułów wykonawczych dostawców (klasy wykonawcze + narzędzia pomocnicze dla poszczególnych dostawców)
+├── executors/              156 modułów wykonawczych dostawców (klasy wykonawcze + narzędzia pomocnicze dla poszczególnych dostawców)
 ├── translator/             Konwersja formatów (OpenAI ↔ Claude ↔ Gemini ↔ Cursor ↔ Kiro)
 ├── transformer/            Transformator strumienia Responses API ↔ Chat Completions
 ├── services/               Ponad 80 modułów usług (kombinacje, mechanizm zapasowy, limity, tożsamość, …)

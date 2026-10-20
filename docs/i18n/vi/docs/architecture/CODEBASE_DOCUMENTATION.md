@@ -447,7 +447,7 @@ open-sse/
 ├── types.d.ts
 ├── config/                 Registry nhà cung cấp, hồ sơ header, danh tính, …
 ├── handlers/               Trình xử lý yêu cầu (chat, embedding, âm thanh, hình ảnh, …)
-├── executors/              150 mô-đun executor nhà cung cấp (các lớp executor + helper cho từng nhà cung cấp)
+├── executors/              156 mô-đun executor nhà cung cấp (các lớp executor + helper cho từng nhà cung cấp)
 ├── translator/             Chuyển đổi định dạng (OpenAI ↔ Claude ↔ Gemini ↔ Cursor ↔ Kiro)
 ├── transformer/            Transformer luồng Responses API ↔ Chat Completions
 ├── services/               Hơn 80 mô-đun dịch vụ (combo, dự phòng, hạn ngạch, danh tính, …)

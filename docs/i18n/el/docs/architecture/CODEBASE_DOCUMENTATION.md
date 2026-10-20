@@ -446,7 +446,7 @@ open-sse/
 ├── types.d.ts
 ├── config/                 Μητρώα παρόχων, προφίλ κεφαλίδων, ταυτότητα, …
 ├── handlers/               Χειριστές αιτημάτων (συνομιλία, embeddings, ήχος, εικόνα, …)
-├── executors/              150 μονάδες executor παρόχων (κλάσεις executor + βοηθητικά ανά πάροχο)
+├── executors/              156 μονάδες executor παρόχων (κλάσεις executor + βοηθητικά ανά πάροχο)
 ├── translator/             Μετατροπή μορφών (OpenAI ↔ Claude ↔ Gemini ↔ Cursor ↔ Kiro)
 ├── transformer/            Transformer ροής Responses API ↔ Chat Completions
 ├── services/               80+ μονάδες υπηρεσιών (συνδυασμοί, fallback, ποσοστώσεις, ταυτότητα, …)
