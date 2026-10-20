@@ -4,8 +4,32 @@ import assert from "node:assert/strict";
 import {
   findVersionClaims,
   isTableRowAt,
+  regexReplace,
   rewriteVersionClaims,
 } from "../../scripts/release/bump-version-claims.mjs";
+
+test("regexReplace counts and rewrites a mirror-propagated mechanical edit", () => {
+  // The executors count the Docs sync gate measures from code (156) was stale in two docs and
+  // their 66 mirrors; mirrors translate the prose but keep the digits next to "375".
+  const pt = "- Superfície de API compatível (375 provedores, 154 módulos executores)";
+  const r = regexReplace(pt, String.raw`(?<pre>375[^\n]{0,80}?)154\b`, "$<pre>156");
+  assert.equal(r.replaced, 1);
+  assert.equal(
+    r.content,
+    "- Superfície de API compatível (375 provedores, 156 módulos executores)"
+  );
+  assert.deepEqual(r.remaining, []);
+  const tree = "├── executors/              150 provider executor modules\n├── 150 other things";
+  const t = regexReplace(tree, String.raw`(?<pre>executors/\s+)150(?<post>\s)`, "$<pre>156$<post>");
+  assert.equal(t.replaced, 1);
+  assert.match(t.content, /executors\/\s+156 provider/);
+  assert.match(t.content, /150 other things/); // only the anchored occurrence
+  assert.equal(
+    regexReplace(t.content, String.raw`(?<pre>executors/\s+)150(?<post>\s)`, "$<pre>156$<post>")
+      .replaced,
+    0
+  );
+});
 
 // The cycle bump (Phase 0a.0b) left release/v3.8.53's README asserting 3.8.52 in three places
 // (2026-10-19); these are the exact shapes the Docs sync strict gate flagged.

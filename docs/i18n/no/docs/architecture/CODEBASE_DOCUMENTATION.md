@@ -446,7 +446,7 @@ open-sse/
 ├── types.d.ts
 ├── config/                 Leverandørregistre, headerprofiler, identitet, …
 ├── handlers/               Forespørselshåndterere (chat, embedding, lyd, bilde, …)
-├── executors/              150 eksekutørmoduler for leverandører (eksekutørklasser + leverandørspesifikke hjelpere)
+├── executors/              156 eksekutørmoduler for leverandører (eksekutørklasser + leverandørspesifikke hjelpere)
 ├── translator/             Formatkonvertering (OpenAI ↔ Claude ↔ Gemini ↔ Cursor ↔ Kiro)
 ├── transformer/            Strømtransformator for Responses API ↔ Chat Completions
 ├── services/               Mer enn 80 tjenestemoduler (kombinasjoner, reservevalg, kvoter, identitet, …)

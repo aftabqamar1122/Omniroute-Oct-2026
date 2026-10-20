@@ -446,7 +446,7 @@ open-sse/
 ├── types.d.ts
 ├── config/                 Teenusepakkujate registrid, päiseprofiilid, identiteet, …
 ├── handlers/               Päringutöötlejad (vestlus, manused, heli, pildid, …)
-├── executors/              150 teenusepakkuja täiturimoodulit (täituriklassid + teenusepakkuja-põhised abifunktsioonid)
+├── executors/              156 teenusepakkuja täiturimoodulit (täituriklassid + teenusepakkuja-põhised abifunktsioonid)
 ├── translator/             Vormingute teisendamine (OpenAI ↔ Claude ↔ Gemini ↔ Cursor ↔ Kiro)
 ├── transformer/            Responses API ↔ Chat Completions voo teisendaja
 ├── services/               Üle 80 teenusemooduli (kombinatsioonid, varuvariandid, kvoodid, identiteet, …)

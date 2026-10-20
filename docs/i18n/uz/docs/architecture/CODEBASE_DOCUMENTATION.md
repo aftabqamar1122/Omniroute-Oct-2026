@@ -445,7 +445,7 @@ open-sse/
 ├── types.d.ts
 ├── config/                 Provayder registrlari, sarlavha profillari, identifikatsiya, …
 ├── handlers/               Soʻrov ishlovchilari (chat, embeddinglar, audio, tasvir, …)
-├── executors/              150 ta provayder ijrochisi moduli (ijrochi sinflari + har bir provayder uchun yordamchilar)
+├── executors/              156 ta provayder ijrochisi moduli (ijrochi sinflari + har bir provayder uchun yordamchilar)
 ├── translator/             Formatlarni oʻzgartirish (OpenAI ↔ Claude ↔ Gemini ↔ Cursor ↔ Kiro)
 ├── transformer/            Responses API ↔ Chat Completions oqim transformatori
 ├── services/               80+ xizmat moduli (kombinatsiyalar, zaxira, kvotalar, identifikatsiya, …)

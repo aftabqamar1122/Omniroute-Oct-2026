@@ -447,7 +447,7 @@ open-sse/
 ├── types.d.ts
 ├── config/                 Pakalpojumu sniedzēju reģistri, galveņu profili, identitāte, …
 ├── handlers/               Pieprasījumu apstrādātāji (tērzēšana, iegultnes, audio, attēli, …)
-├── executors/              150 pakalpojumu sniedzēju izpildītāju moduļi (izpildītāju klases + katra pakalpojumu sniedzēja palīgmoduļi)
+├── executors/              156 pakalpojumu sniedzēju izpildītāju moduļi (izpildītāju klases + katra pakalpojumu sniedzēja palīgmoduļi)
 ├── translator/             Formātu konvertēšana (OpenAI ↔ Claude ↔ Gemini ↔ Cursor ↔ Kiro)
 ├── transformer/            Responses API ↔ Chat Completions straumes transformators
 ├── services/               Vairāk nekā 80 pakalpojumu moduļi (kombinācijas, atkāpšanās mehānismi, kvotas, identitāte, …)

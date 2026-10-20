@@ -445,7 +445,7 @@ open-sse/
 ├── types.d.ts
 ├── config/                 Clárlanna soláthraithe, próifílí ceanntásca, aitheantas, …
 ├── handlers/               Láimhseálaithe iarratas (comhrá, leabuithe, fuaim, íomhá, …)
-├── executors/              150 modúl seiceadóra soláthraí (aicmí seiceadóra + cúntóirí in aghaidh an tsoláthraí)
+├── executors/              156 modúl seiceadóra soláthraí (aicmí seiceadóra + cúntóirí in aghaidh an tsoláthraí)
 ├── translator/             Tiontú formáide (OpenAI ↔ Claude ↔ Gemini ↔ Cursor ↔ Kiro)
 ├── transformer/            API Responses ↔ Claochladán srutha Chat Completions
 ├── services/               80+ modúl seirbhíse (teaglamaí, cúltaca, cuótaí, aitheantas, …)

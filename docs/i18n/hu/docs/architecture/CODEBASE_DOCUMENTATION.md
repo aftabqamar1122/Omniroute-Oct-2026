@@ -447,7 +447,7 @@ open-sse/
 ├── types.d.ts
 ├── config/                 Szolgáltatói nyilvántartások, fejlécprofilok, identitás, …
 ├── handlers/               Kéréskezelők (csevegés, beágyazások, hang, kép, …)
-├── executors/              150 szolgáltatói végrehajtómodul (végrehajtóosztályok + szolgáltatónkénti segédmodulok)
+├── executors/              156 szolgáltatói végrehajtómodul (végrehajtóosztályok + szolgáltatónkénti segédmodulok)
 ├── translator/             Formátumkonverzió (OpenAI ↔ Claude ↔ Gemini ↔ Cursor ↔ Kiro)
 ├── transformer/            Responses API ↔ Chat Completions adatfolyam-transzformátor
 ├── services/               Több mint 80 szolgáltatásmodul (kombinációk, tartalékmechanizmusok, kvóták, identitás, …)

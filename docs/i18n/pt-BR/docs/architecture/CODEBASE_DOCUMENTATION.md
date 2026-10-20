@@ -447,7 +447,7 @@ open-sse/
 ├── types.d.ts
 ├── config/                 Registros de provedores, perfis de cabeçalhos, identidade, …
 ├── handlers/               Manipuladores de requisições (chat, embeddings, áudio, imagem, …)
-├── executors/              150 módulos executores de provedores (classes executoras + auxiliares por provedor)
+├── executors/              156 módulos executores de provedores (classes executoras + auxiliares por provedor)
 ├── translator/             Conversão de formatos (OpenAI ↔ Claude ↔ Gemini ↔ Cursor ↔ Kiro)
 ├── transformer/            Transformador de stream da Responses API ↔ Chat Completions
 ├── services/               Mais de 80 módulos de serviço (combos, fallback, cotas, identidade, …)
