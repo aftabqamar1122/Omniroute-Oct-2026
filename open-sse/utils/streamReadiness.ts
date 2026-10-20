@@ -538,7 +538,13 @@ function processStreamReadinessEvent(state: StreamReadinessSignalState): boolean
     }
     return hasNonPingStructuredPayload(payload, eventType);
   } catch {
-    return data.length > 0;
+    // A non-JSON payload under data: (a proxy error page, a raw log line, a
+    // truncated fragment) is not a readiness signal. The previous non-empty
+    // tolerance released such garbage as a false 200; refusing it here lets a
+    // non-SSE text upstream fail with a classified error instead. Only a
+    // non-ping JSON payload, or a structural SSE field line outside data:, is
+    // a signal.
+    return false;
   }
 }
 
@@ -556,7 +562,15 @@ function processStreamReadinessLine(state: StreamReadinessSignalState, line: str
 
   if (trimmed.startsWith("data:")) {
     state.dataLines.push(trimmed.slice(5).trimStart());
+    return false;
   }
+
+  // A structural SSE field line outside the data: payload (id: / retry:) is a
+  // readiness signal: a real SSE stream carries such fields. A raw text line
+  // without SSE field syntax is not — it stays refused so a non-SSE text
+  // upstream (a raw HTML page, a bare log line) still fails with a classified
+  // error instead of being replayed as a false 200.
+  if (/^(?:id|retry):/i.test(trimmed)) return true;
   return false;
 }
 
@@ -999,11 +1013,11 @@ export async function ensureStreamReadiness(
         continue;
       }
 
-      // Liveness extension: bytes arrived → connection is alive, not dead.
-      // Reset the deadline so slow-but-alive upstreams (reasoning warm-ups,
-      // keepalive-only phases) are not aborted.  The hard ceiling (maxDeadline)
-      // prevents unbounded waits and preserves the operator's fast-fail intent
-      // for truly dead connections.
+      // Liveness extension: only a chunk carrying a readiness signal or
+      // reasoning progress extends the deadline — the same "alive" test the
+      // gate below uses. Ping/keepalive-only chunks let the initial deadline
+      // run, so a ping-only upstream fails at the first deadline. The hard
+      // ceiling (maxDeadline) bounds the extension and is never raised here.
       // Parked streams: heartbeat comment frames suspend (freeze) the stall
       // deadline instead of extending it — the stall clock does not run
       // during the park. Data frames use the normal liveness path.
@@ -1013,7 +1027,10 @@ export async function ensureStreamReadiness(
         // Suspend: push the deadline forward by exactly the time spent
         // waiting, so the stall clock does not run during the park.
         deadline = Math.min(deadlineBeforeRead + (now - readStart), maxDeadline);
-      } else if (deadline < maxDeadline) {
+      } else if (
+        deadline < maxDeadline &&
+        (hasStreamReadinessSignal(decodedChunk) || isReasoningProgressFrame(decodedChunk))
+      ) {
         deadline = Math.min(now + effectiveTimeoutMs, maxDeadline);
         if (now - startedAt > effectiveTimeoutMs) {
           options.log?.debug?.(

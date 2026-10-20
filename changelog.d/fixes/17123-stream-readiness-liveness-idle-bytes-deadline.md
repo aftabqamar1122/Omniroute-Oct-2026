@@ -1,0 +1,1 @@
+- **fix(sse):** ping-only upstreams now fail at the first readiness deadline instead of the ceiling, and non-JSON garbage under `data:` is refused at the readiness gate instead of being replayed as a false 200 ([#17123](https://github.com/diegosouzapw/OmniRoute/pull/17123)) — thanks @maxmad64bis
