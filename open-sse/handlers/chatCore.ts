@@ -182,6 +182,7 @@ import { stageTrace } from "./chatCore/stageTrace.ts";
 import { attachCompressionUsageReceiptAfterAnalytics as attachCompressionUsageReceiptAfterAnalyticsFor } from "./chatCore/compressionUsageReceipt.ts";
 
 import { getQuotaScopeLabelForProvider } from "../services/antigravityQuotaFamily.ts";
+import { handleClaudeQuotaFailure } from "./chatCore/claudeQuotaFailure.ts";
 import { excludeConnectionForCooldown } from "./chatCore/connectionCooldown.ts";
 import { handleProjectRouteFailure } from "./chatCore/projectRouteFailure.ts";
 import { handleRequestRejectedFailure } from "./chatCore/requestRejectedFailure.ts";
@@ -2710,6 +2711,24 @@ async function handleChatCoreInner({
     const errorConnectionId = getCurrentConnectionId() || connectionId;
     if (errorConnectionId && errorType) {
       try {
+        if (
+          await handleClaudeQuotaFailure({
+            provider,
+            connectionId: errorConnectionId,
+            model: targetModel,
+            status: statusCode,
+            errorText: message,
+            retainedMessage: persistentMessage,
+            retryAfterMs,
+            hasCallerOwner: typeof onStreamFailure === "function",
+            deps: {
+              readConnection: getProviderConnectionById,
+              persistConnection: updateProviderConnection,
+              isProbe: shouldIsolateProbeFailures,
+            },
+          })
+        )
+          return;
         if (errorType === PROVIDER_ERROR_TYPES.FORBIDDEN) {
           const probeIsolated = await shouldIsolateProbeFailures();
           await writeTerminalStatus(
