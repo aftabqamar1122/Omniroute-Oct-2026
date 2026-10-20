@@ -205,6 +205,11 @@ export function isUpstreamNetworkError(err) {
   }
 }
 
+function isSemaphoreCapacityError(err) {
+  if (!err || typeof err !== "object") return false;
+  return err.code === "SEMAPHORE_TIMEOUT" || err.code === "SEMAPHORE_QUEUE_FULL";
+}
+
 /**
  * Decide whether a process-level uncaughtException/unhandledRejection should be
  * swallowed (benign client-abort, or a recoverable upstream timeout that a
@@ -222,7 +227,8 @@ export function shouldSwallowUncaught(err, origin) {
     !isClientAbortError(err) &&
     !isRecoverableUpstreamTimeoutError(err) &&
     !isIntentionalComboAbort(err) &&
-    !isUpstreamNetworkError(err)
+    !isUpstreamNetworkError(err) &&
+    !isSemaphoreCapacityError(err)
   ) {
     return false;
   }
