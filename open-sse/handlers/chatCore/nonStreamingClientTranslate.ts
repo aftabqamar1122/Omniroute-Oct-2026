@@ -101,7 +101,8 @@ export function translateNonStreamingClientResponse(
         clientResponseFormat,
         responseToolNameMap,
         responseToolSchemas,
-        requestedThinking
+        requestedThinking,
+        (input.clientRequestBody as Record<string, unknown> | null | undefined)?.tools ?? null
       )
     : responseBody;
   const responseForMemoryExtraction = translatedResponse;
