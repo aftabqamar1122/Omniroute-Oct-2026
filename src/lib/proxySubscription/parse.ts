@@ -185,7 +185,8 @@ function nodeFromUri(uri: string): SubscriptionNode | NeedsCoreNode | null {
 
   const name = decodeURIComponent(parsed.hash.replace(/^#/, "")) || parsed.hostname;
   const host = parsed.hostname;
-  const port = Number(parsed.port);
+  const defaultPort = scheme === "http" ? 80 : scheme === "https" ? 443 : 0;
+  const port = parsed.port ? Number(parsed.port) : defaultPort;
   if (!host || !port) return null;
 
   if (DIRECT_TYPES.has(scheme)) {
