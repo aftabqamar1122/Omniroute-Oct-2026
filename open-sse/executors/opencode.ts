@@ -294,12 +294,31 @@ export class OpencodeExecutor extends BaseExecutor {
   // Member health shared across requests on this alias, keyed by member id.
   // Each request still walks its own list (see `opencodeAccountScope.ts`).
   accountHealth = new Map<string, ScopedAccountHealth>();
+  // Cache invalidation version: incremented on any accountHealth mutation.
+  #accountsVersion = 0;
+  // Cached live view of accounts getter. Invalidate when version changes.
+  #accountsCache: ScopedAccount[] | null = null;
+  // Cached version when #accountsCache was built.
+  #accountsCacheVersion = 0;
+  // Invalidate the accounts cache (call after any accountHealth mutation).
+  #invalidateAccountsCache(): void {
+    this.#accountsVersion++;
+    this.#accountsCache = null;
+    this.#accountsCacheVersion = 0;
+  }
   get accounts(): ScopedAccount[] {
+    if (this.#accountsCache && this.#accountsCacheVersion === this.#accountsVersion) {
+      return this.#accountsCache;
+    }
     const store = this.accountHealth;
     // Cold parity with the historical default direct member (read-only).
     if (store.size === 0) {
-      return [{ fingerprint: "", cooldownUntil: 0, consecutiveFails: 0, proxy: null }];
+      const empty = [{ fingerprint: "", cooldownUntil: 0, consecutiveFails: 0, proxy: null }];
+      this.#accountsCache = empty;
+      this.#accountsCacheVersion = this.#accountsVersion;
+      return empty;
     }
+    const invalidate = () => this.#invalidateAccountsCache();
     const live = [...store.entries()].map(([fingerprint]) => ({
       fingerprint,
       get cooldownUntil() {
@@ -308,6 +327,7 @@ export class OpencodeExecutor extends BaseExecutor {
       set cooldownUntil(value: number) {
         const current = store.get(fingerprint) ?? { cooldownUntil: 0, consecutiveFails: 0 };
         store.set(fingerprint, { ...current, cooldownUntil: value });
+        invalidate();
       },
       get consecutiveFails() {
         return store.get(fingerprint)?.consecutiveFails ?? 0;
@@ -315,9 +335,12 @@ export class OpencodeExecutor extends BaseExecutor {
       set consecutiveFails(value: number) {
         const current = store.get(fingerprint) ?? { cooldownUntil: 0, consecutiveFails: 0 };
         store.set(fingerprint, { ...current, consecutiveFails: value });
+        invalidate();
       },
       proxy: null as ScopedAccount["proxy"],
     }));
+    this.#accountsCache = live;
+    this.#accountsCacheVersion = this.#accountsVersion;
     return live;
   }
   // Sleep used by the opt-in transient failover pause (#13615). Not `private`:
@@ -543,7 +566,7 @@ export class OpencodeExecutor extends BaseExecutor {
         return withRequestShapeRetry(input, (i) => this.executeOnce(i));
       });
     } finally {
-      releaseRequestList(input.body, this.accountHealth);
+      releaseRequestList(input.body, this.accountHealth, () => this.#invalidateAccountsCache());
     }
   }
 
