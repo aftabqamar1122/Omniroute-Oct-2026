@@ -32,14 +32,18 @@ on:
 
 # One publish per ref. A merge storm used to fan out 8 concurrent hosted builds,
 # every one OOM-killing `npm run build` inside BuildKit (#11976). The :next
-# channel only needs the newest SHA; cancel-in-progress is the same pattern as
-# quality.yml / nightly-release-green.
+# channel only needs the newest SHA, but a started publish is never cancelled: a
+# build takes 1-4 h and the release branch gets several pushes an hour, so with
+# cancel-in-progress every newer push killed the in-flight publish and :next went
+# 13 days without an image (#17230). GitHub keeps one running + one pending run per
+# group and a newer push replaces the pending one, so the storm still collapses to
+# the newest SHA (same fix as nightly-release-green).
 # The nightly `schedule` run (runner-alert only) gets its own group: it runs on the
-# default branch ref, so sharing the publish group would let cancel-in-progress kill
-# an in-flight release-branch publish every night (#14560 follow-up).
+# default branch ref, so sharing the publish group would hold an in-flight
+# release-branch publish's slot every night (#14560 follow-up).
 concurrency:
   group: docker-publish-${{ github.event_name == 'schedule' && 'runner-alert' || github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 # Least-privilege default: read-only at the top level; the build and merge jobs that
 # push to GHCR grant packages: write themselves (Scorecard TokenPermissions).

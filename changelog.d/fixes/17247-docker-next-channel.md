@@ -1,0 +1,1 @@
+- **fix(ci):** Docker publishes on a busy release branch are no longer cancelled by newer pushes, so the `next`, `next-web` and `next-bun` images publish again instead of going stale ([#17247](https://github.com/diegosouzapw/OmniRoute/pull/17247)) — thanks @quantum-shubham
